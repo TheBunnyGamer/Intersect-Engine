@@ -990,6 +990,7 @@ namespace Intersect.Server.Entities
                 }
             }
 
+            CommandProcessing.IncreaseCombo(this);
             base.TryAttack(target, projectile, parentSpell, parentItem, projectileDir);
         }
 
