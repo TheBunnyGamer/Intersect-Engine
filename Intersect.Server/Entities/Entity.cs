@@ -2225,6 +2225,54 @@ namespace Intersect.Server.Entities
                     PacketSender.SendSpellCooldown((Player) this, Spells[spellSlot].SpellId);
                 }
             }
+
+            string[] chainfromspellnames = Options.chainfromspellnames;
+            string[] chaintospellnames = Options.chaintospellnames;
+            int[] chaintospellwaittimes = Options.chaintospellwaits;
+
+            for (int i2 = 0; i2 < chainfromspellnames.Length; i2++) //loop for every chain from spell name
+            {
+                if (spellBase.Name == chainfromspellnames[i2]) //if spell used is a chain from spell
+                {
+
+                    var tempfinished = false;
+                    var tempvalue = 0;
+                    while (tempfinished == false) //loop until chained spell is used or chained spell is found to not exist
+                    {
+                        var tempspellid = Guid.NewGuid();
+                        try
+                        {
+                            tempspellid = SpellBase.IdFromList(tempvalue); //get a random spell id
+                        }
+                        catch
+                        {
+                            tempfinished = true;
+                        }
+                        tempvalue = tempvalue + 1;
+                        if (tempspellid != null) //if the spell exists
+                        {
+                            var tempspell = SpellBase.Get(tempspellid); //get the spell from its id
+                            if (tempspell != null)
+                            {
+                                if (tempspell.Name == chaintospellnames[i2]) //if the spell's name is equal to the chained spell associated with the chain from spell
+                                {
+                                    if (CanCastSpell(tempspell, CastTarget) || (GetType() == typeof(Player))) //if the spell is able to be cast
+                                    {
+                                        System.Threading.Thread.Sleep(chaintospellwaittimes[i2]); //wait the duration
+                                        CastSpell(tempspellid); //use spell!
+                                        tempfinished = true;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            tempfinished = true; //if the spell doesn't exist give up
+                        }
+                    }
+                }
+            }
+
         }
 
         private void HandleAoESpell(

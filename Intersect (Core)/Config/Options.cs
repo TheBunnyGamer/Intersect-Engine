@@ -16,6 +16,14 @@ namespace Intersect
         //Caching Json
         private static string optionsCompressed = "";
 
+
+        [JsonProperty("Chain From Spells List", Order = -7)]
+        protected string[] _chainfromspelllist = new string[] { };
+        [JsonProperty("Chain To Spells List", Order = -6)]
+        protected string[] _chaintospelllist = new string[] { };
+        [JsonProperty("Chain To Spells Wait Duration List", Order = -5)]
+        protected int[] _chaintospellwaitlist = new int[] { };
+
         [JsonProperty("AdminOnly", Order = -3)]
         protected bool _adminOnly = false;
 
@@ -68,6 +76,10 @@ namespace Intersect
         public static ushort ServerPort { get => Instance._serverPort; set => Instance._serverPort = value; }
 
         public static int MaxStatValue => Instance.PlayerOpts.MaxStat;
+
+        public static string[] chainfromspellnames { get => Instance._chainfromspelllist; set => Instance._chainfromspelllist = value; }
+        public static string[] chaintospellnames { get => Instance._chaintospelllist; set => Instance._chaintospelllist = value; }
+        public static int[] chaintospellwaits { get => Instance._chaintospellwaitlist; set => Instance._chaintospellwaitlist = value; }
 
         public static int MaxLevel => Instance.PlayerOpts.MaxLevel;
 

@@ -1,0 +1,51 @@
+From 44b1ad01ec41a5902b2a156e58da01af0487f12e Mon Sep 17 00:00:00 2001
+From: TheBunnyGamer <65855333+TheBunnyGamer@users.noreply.github.com>
+Date: Sat, 12 Sep 2020 23:37:07 +0100
+Subject: [PATCH] Chain Spells
+
+Adds chain spell functionality
+---
+ Intersect.Server/Entities/Player.cs | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+
+diff --git a/Intersect.Server/Entities/Player.cs b/Intersect.Server/Entities/Player.cs
+index 4cbad33a..f9b23ce6 100644
+--- a/Intersect.Server/Entities/Player.cs
++++ b/Intersect.Server/Entities/Player.cs
+@@ -4259,6 +4259,33 @@ public void UseSpell(int spellSlot, Entity target)
+                         //Tell the client we are channeling the spell
+                         PacketSender.SendEntityCastTime(this, spellNum);
+                     }
++
++                    //bunny addition
++
++                    string[] chainfromspellnames = new string[] { };
++                    string[] chaintospellnames = new string[] { };
++                    int[] chaintospellwaittimes = new int[] { };
++
++                    for (int i2 = 0; i2 < chainfromspellnames.Length; i2++)
++                    {
++                        if (spell.Name == chainfromspellnames[i2])
++                        {
++                            for (int i = 0; i < Spells.Count; i++)
++                            {
++                                var currentspelltocheck = SpellBase.Get(Spells[i].SpellId);
++                                if (currentspelltocheck != null)
++                                {
++                                    if (currentspelltocheck.Name == chaintospellnames[i2]) //name of spell to chain
++                                    {
++                                        Thread.Sleep(chaintospellwaittimes[i2]);
++                                        UseSpell(i, target); //use chained spell
++                                    }
++                                }
++                            }
++                        }
++                    }
++                    //bunny addition
++
+                 }
+                 else
+                 {
+-- 
+2.26.2.windows.1
+

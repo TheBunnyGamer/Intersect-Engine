@@ -4260,32 +4260,6 @@ namespace Intersect.Server.Entities
                         PacketSender.SendEntityCastTime(this, spellNum);
                     }
 
-                    //bunny addition
-
-                    string[] chainfromspellnames = new string[] { };
-                    string[] chaintospellnames = new string[] { };
-                    int[] chaintospellwaittimes = new int[] { };
-
-                    for (int i2 = 0; i2 < chainfromspellnames.Length; i2++)
-                    {
-                        if (spell.Name == chainfromspellnames[i2])
-                        {
-                            for (int i = 0; i < Spells.Count; i++)
-                            {
-                                var currentspelltocheck = SpellBase.Get(Spells[i].SpellId);
-                                if (currentspelltocheck != null)
-                                {
-                                    if (currentspelltocheck.Name == chaintospellnames[i2]) //name of spell to chain
-                                    {
-                                        Thread.Sleep(chaintospellwaittimes[i2]);
-                                        UseSpell(i, target); //use chained spell
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    //bunny addition
-
                 }
                 else
                 {
