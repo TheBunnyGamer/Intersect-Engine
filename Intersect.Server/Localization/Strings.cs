@@ -1200,7 +1200,7 @@ namespace Intersect.Server.Localization
                 password = @"^[-_=\+`~!@#\$%\^&\*()\[\]{}\\|;\:'"",<\.>/\?a-zA-Z0-9]{4,64}$";
 
             [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-            public readonly LocalizedString username = @"^[a-zA-Z0-9]{2,20}$";
+            public readonly LocalizedString username = @"^[a-zA-Z0-9]{1,20}$";
 
         }
 

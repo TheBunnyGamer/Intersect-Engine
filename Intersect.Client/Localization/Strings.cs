@@ -1240,7 +1240,7 @@ namespace Intersect.Client.Localization
 
             public static LocalizedString password = @"^[-_=\+`~!@#\$%\^&\*()\[\]{}\\|;\:'"",<\.>/\?a-zA-Z0-9]{4,64}$";
 
-            public static LocalizedString username = @"^[a-zA-Z0-9]{2,20}$";
+            public static LocalizedString username = @"^[a-zA-Z0-9]{1,20}$";
 
         }
 

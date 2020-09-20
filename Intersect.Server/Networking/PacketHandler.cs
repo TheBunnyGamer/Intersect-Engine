@@ -1085,7 +1085,7 @@ namespace Intersect.Server.Networking
                 return;
             }
 
-            if (!FieldChecking.IsValidUsername(packet.Name, Strings.Regex.username) | ProfanityFilter.ContainsFilteredWords(packet.Name))
+            if (!FieldChecking.IsValidUsername(packet.Name, "^[a-zA-Z0-9]{1,20}$") | ProfanityFilter.ContainsFilteredWords(packet.Name)) //Strings.Regex.username where the regex is
             {
                 PacketSender.SendError(client, Strings.Account.invalidname);
 

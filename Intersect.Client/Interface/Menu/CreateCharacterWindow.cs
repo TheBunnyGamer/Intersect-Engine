@@ -466,7 +466,7 @@ namespace Intersect.Client.Interface.Menu
                 return;
             }
 
-            if (FieldChecking.IsValidUsername(mCharnameTextbox.Text, Strings.Regex.username))
+            if (FieldChecking.IsValidUsername(mCharnameTextbox.Text, "^[a-zA-Z0-9]{1,20}$")) //Strings.Regex.username))
             {
                 if (mMaleChk.IsChecked)
                 {
