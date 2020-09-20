@@ -13,7 +13,7 @@ namespace Intersect.Utilities
 
         public const string PATTERN_PASSWORD = @"^[-_=\+`~!@#\$%\^&\*()\[\]{}\\|;\:'"",<\.>/\?a-zA-Z0-9]{4,64}$";
 
-        public const string PATTERN_USERNAME = @"^[a-zA-Z0-9]{2,24}$";
+        public const string PATTERN_USERNAME = @"^[a-zA-Z0-9]{1,24}$";
 
         public static bool IsWellformedEmailAddress(string email, string emailRegex)
         {
