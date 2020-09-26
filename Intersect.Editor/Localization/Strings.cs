@@ -1273,6 +1273,19 @@ Tick timer saved in server config.json.";
 
         }
 
+        public struct EventRemoveHotbarSpell
+        {
+
+            public static LocalizedString cancel = @"Cancel";
+
+            public static LocalizedString item = @"Spell:";
+
+            public static LocalizedString okay = @"Ok";
+
+            public static LocalizedString title = @"Remove Equipped Hotbar Spell";
+
+        }
+
         public struct EventChangeVital
         {
 
@@ -1429,6 +1442,8 @@ Tick timer saved in server config.json.";
             public static LocalizedString equipitem = @"Equip Player Item [{00}]";
 
             public static LocalizedString hotbarspell = @"Place spell in hotbar: [{00}]";
+
+            public static LocalizedString removehotbarspell = @"Remove spell from hotbar: [{00}]";
 
             public static LocalizedString changespells = @"Change Player Spells [{00}]";
 
@@ -1741,6 +1756,7 @@ Tick timer saved in server config.json.";
                 {"showplayer", @"Show Player"},
                 {"equipitem", @"Equip Item"},
                 {"hotbarspell", @"Hotbar Spell"},
+                {"removehotbarspell", @"Remove Hotbar Spell"},
                 {"changenamecolor", @"Change Name Color"},
                 {"inputvariable", @"Input Variable"},
                 {"changeplayerlabel", @"Change Player Label"},

@@ -86,6 +86,12 @@
     <Compile Include="Core\Preferences.cs" />
     <Compile Include="Core\Program.cs" />
     <Compile Include="Entities\Animation.cs" />
+    <Compile Include="Forms\Editors\Events\Event Commands\EventCommand_RemoveHotbarSpell.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Editors\Events\Event Commands\EventCommand_RemoveHotbarSpell.Designer.cs">
+      <DependentUpon>EventCommand_RemoveHotbarSpell.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\Editors\Events\Event Commands\EventCommand_HotbarSpell.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -668,6 +674,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Editors\Events\Event Commands\EventCommand_ChangeNameColor.resx">
       <DependentUpon>EventCommand_ChangeNameColor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Editors\Events\Event Commands\EventCommand_RemoveHotbarSpell.resx">
+      <DependentUpon>EventCommand_RemoveHotbarSpell.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Editors\Events\Event Commands\EventCommand_HotbarSpell.resx">
       <DependentUpon>EventCommand_HotbarSpell.cs</DependentUpon>

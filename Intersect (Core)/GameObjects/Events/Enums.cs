@@ -227,6 +227,9 @@
         //Hotbar Spells
         HotbarSpell,
 
+        //Remove Hotbar Spells
+        RemoveHotbarSpell,
+
     }
 
 }

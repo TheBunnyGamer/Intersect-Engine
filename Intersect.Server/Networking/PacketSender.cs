@@ -1808,6 +1808,12 @@ namespace Intersect.Server.Networking
             player.SendPacket(new HotbarSpellPacket(spelltohotbar));
         }
 
+        //RemoveHotbarSpellPacket
+        public static void SendRemoveHotBarSpell(Player player, Guid spelltohotbar)
+        {
+            player.SendPacket(new RemoveHotbarSpellPacket(spelltohotbar));
+        }
+
         //PasswordResetResultPacket
         public static void SendPasswordResetResult(Client client, bool result)
         {

@@ -595,6 +595,10 @@ namespace Intersect.Editor.Forms.Editors.Events
                     tmpCommand = new CommandHotbarSpellCommand();
 
                     break;
+                case EventCommandType.RemoveHotbarSpell:
+                    tmpCommand = new CommandRemoveHotbarSpellCommand();
+
+                    break;
                 case EventCommandType.ChangeSprite:
                     tmpCommand = new ChangeSpriteCommand();
 
@@ -1173,6 +1177,10 @@ namespace Intersect.Editor.Forms.Editors.Events
                     break;
                 case EventCommandType.HotbarSpell:
                     cmdWindow = new EventCommandHotbarSpell((CommandHotbarSpellCommand) command, this);
+
+                    break;
+                case EventCommandType.RemoveHotbarSpell:
+                    cmdWindow = new EventCommandRemoveHotbarSpell((CommandRemoveHotbarSpellCommand) command, this);
 
                     break;
                 case EventCommandType.ChangeSprite:

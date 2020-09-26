@@ -630,6 +630,11 @@ namespace Intersect.Editor.Forms.Editors.Events
             return Strings.EventCommandList.hotbarspell.ToString(SpellBase.GetName(command.SpellId));
         }
 
+        private static string GetCommandText(CommandRemoveHotbarSpellCommand command, MapInstance map)
+        {
+            return Strings.EventCommandList.removehotbarspell.ToString(SpellBase.GetName(command.SpellId));
+        }
+
         private static string GetCommandText(ChangeSpriteCommand command, MapInstance map)
         {
             return Strings.EventCommandList.setsprite.ToString(command.Sprite);

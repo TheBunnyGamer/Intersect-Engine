@@ -486,6 +486,25 @@ namespace Intersect.Server.Entities.Events
             PacketSender.SendHotBarSpell(player, command.SpellId);
         }
 
+        //Remove Hotbar Spell Command
+        private static void ProcessCommand(
+            CommandRemoveHotbarSpellCommand command,
+            Player player,
+            Event instance,
+            CommandInstance stackInfo,
+            Stack<CommandInstance> callStack
+        )
+        {
+            var itm = SpellBase.Get(command.SpellId);
+
+            if (itm == null)
+            {
+                return;
+            }
+
+            PacketSender.SendRemoveHotBarSpell(player, command.SpellId);
+        }
+
         //Change Sprite Command
         private static void ProcessCommand(
             ChangeSpriteCommand command,

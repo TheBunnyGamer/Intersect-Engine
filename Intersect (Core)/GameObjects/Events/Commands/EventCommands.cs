@@ -486,6 +486,15 @@ namespace Intersect.GameObjects.Events.Commands
 
     }
 
+    public class CommandRemoveHotbarSpellCommand : EventCommand
+    {
+
+        public override EventCommandType Type { get; } = EventCommandType.RemoveHotbarSpell;
+
+        public Guid SpellId { get; set; }
+
+    }
+
     public class ChangeSpriteCommand : EventCommand
     {
 

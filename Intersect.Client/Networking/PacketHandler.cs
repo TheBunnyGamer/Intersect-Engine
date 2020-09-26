@@ -172,6 +172,23 @@ namespace Intersect.Client.Networking
             }
         }
 
+        //RemoveHotbarSpellPacket
+        private static void HandlePacket(RemoveHotbarSpellPacket packet)
+        {
+            var spellfind = SpellBase.Get(packet.SpellToHotbar);
+            if (spellfind != null)
+            {
+                for (var i = 0; i < Globals.Me.Hotbar.Length; i++)
+                {
+                    if (Globals.Me.Hotbar[i].ItemOrSpellId == packet.SpellToHotbar)
+                    {
+                        Globals.Me.AddToHotbar((byte)i, -1, -1);
+                        //return; - If you only want one instance of the spell on the hotbar to be removed
+                    }
+                }
+            }
+        }
+
         //PlayerEntityPacket
         private static void HandlePacket(PlayerEntityPacket packet)
         {
