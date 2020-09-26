@@ -467,6 +467,25 @@ namespace Intersect.Server.Entities.Events
             player.EquipItem(ItemBase.Get(command.ItemId));
         }
 
+        //Hotbar Spell Command
+        private static void ProcessCommand(
+            CommandHotbarSpellCommand command,
+            Player player,
+            Event instance,
+            CommandInstance stackInfo,
+            Stack<CommandInstance> callStack
+        )
+        {
+            var itm = SpellBase.Get(command.SpellId);
+
+            if (itm == null)
+            {
+                return;
+            }
+
+            PacketSender.SendHotBarSpell(player, command.SpellId);
+        }
+
         //Change Sprite Command
         private static void ProcessCommand(
             ChangeSpriteCommand command,

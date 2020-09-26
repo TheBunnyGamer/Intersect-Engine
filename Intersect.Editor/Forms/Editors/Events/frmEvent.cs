@@ -591,6 +591,10 @@ namespace Intersect.Editor.Forms.Editors.Events
                     tmpCommand = new EquipItemCommand();
 
                     break;
+                case EventCommandType.HotbarSpell:
+                    tmpCommand = new CommandHotbarSpellCommand();
+
+                    break;
                 case EventCommandType.ChangeSprite:
                     tmpCommand = new ChangeSpriteCommand();
 
@@ -1165,6 +1169,10 @@ namespace Intersect.Editor.Forms.Editors.Events
                     break;
                 case EventCommandType.EquipItem:
                     cmdWindow = new EventCommandEquipItems((EquipItemCommand) command, this);
+
+                    break;
+                case EventCommandType.HotbarSpell:
+                    cmdWindow = new EventCommandHotbarSpell((CommandHotbarSpellCommand) command, this);
 
                     break;
                 case EventCommandType.ChangeSprite:
@@ -1765,6 +1773,10 @@ namespace Intersect.Editor.Forms.Editors.Events
 
         #endregion
 
+        private void lstCommands_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+
+        }
     }
 
     public class CommandListProperties

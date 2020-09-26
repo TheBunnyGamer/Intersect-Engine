@@ -149,6 +149,29 @@ namespace Intersect.Client.Networking
             Globals.Me.FetchNewMaps();
         }
 
+        //HotbarSpellPacket
+        private static void HandlePacket(HotbarSpellPacket packet)
+        {
+            var spellfind = SpellBase.Get(packet.SpellToHotbar);
+            if (spellfind != null)
+            {
+                for (var i = 0; i < Globals.Me.Spells.Length; i++)
+                {
+                    if (Globals.Me.Spells[i].SpellId == packet.SpellToHotbar)
+                    {
+                        for (var i2 = 0; i2 < Globals.Me.Hotbar.Length; i2++)
+                        {
+                            if (Globals.Me.Hotbar[i2].ItemOrSpellId == Guid.Empty)
+                            {
+                                Globals.Me.AddToHotbar((byte) i2, 1, i);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         //PlayerEntityPacket
         private static void HandlePacket(PlayerEntityPacket packet)
         {

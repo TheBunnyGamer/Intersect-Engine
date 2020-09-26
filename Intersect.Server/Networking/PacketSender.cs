@@ -1801,6 +1801,12 @@ namespace Intersect.Server.Networking
         {
             player.SendPacket(new FriendRequestPacket(partner.Id, partner.Name));
         }
+        
+        //HotbarSpellPacket
+        public static void SendHotBarSpell(Player player, Guid spelltohotbar)
+        {
+            player.SendPacket(new HotbarSpellPacket(spelltohotbar));
+        }
 
         //PasswordResetResultPacket
         public static void SendPasswordResetResult(Client client, bool result)
