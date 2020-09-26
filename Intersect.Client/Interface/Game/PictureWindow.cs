@@ -30,63 +30,75 @@ namespace Intersect.Client.Interface.Game
 
         public void Setup(string picture, int size, bool clickable)
         {
+
             Picture = picture;
             Size = size;
             Clickable = clickable;
 
-            mPicture.Texture = Globals.ContentManager.GetTexture(GameContentManager.TextureType.Image, picture);
-            if (mPicture.Texture != null)
+            if (Clickable == true)
             {
-                mPicture.SetSize(mPicture.Texture.GetWidth(), mPicture.Texture.GetHeight());
-                Align.Center(mPicture);
-
-                if (size != (int) PictureSize.Original) // Don't scale if you want to keep the original size.
+                mPicture.Texture = Globals.ContentManager.GetTexture(GameContentManager.TextureType.Image, picture);
+                if (mPicture.Texture != null)
                 {
-                    if (size == (int) PictureSize.StretchToFit)
+                    mPicture.SetSize(mPicture.Texture.GetWidth(), mPicture.Texture.GetHeight());
+                    Align.Center(mPicture);
+
+                    if (size != (int)PictureSize.Original) // Don't scale if you want to keep the original size.
                     {
-                        mPicture.SetSize(mGameCanvas.Width, mGameCanvas.Height);
-                        Align.Center(mPicture);
-                    }
-                    else
-                    {
-                        var n = 1;
-
-                        //If you want half fullscreen size set n to 2.
-                        if (size == (int) PictureSize.HalfScreen)
+                        if (size == (int)PictureSize.StretchToFit)
                         {
-                            n = 2;
-                        }
-
-                        var ar = (float) mPicture.Width / (float) mPicture.Height;
-                        var heightLimit = true;
-                        if (mGameCanvas.Width < mGameCanvas.Height * ar)
-                        {
-                            heightLimit = false;
-                        }
-
-                        if (heightLimit)
-                        {
-                            var height = mGameCanvas.Height;
-                            var width = mGameCanvas.Height * ar;
-                            mPicture.SetSize((int) (width / n), (int) (height / n));
+                            mPicture.SetSize(mGameCanvas.Width, mGameCanvas.Height);
                             Align.Center(mPicture);
                         }
                         else
                         {
-                            var width = mGameCanvas.Width;
-                            var height = width / ar;
-                            mPicture.SetSize((int) (width / n), (int) (height / n));
-                            Align.Center(mPicture);
+                            var n = 1;
+
+                            //If you want half fullscreen size set n to 2.
+                            if (size == (int)PictureSize.HalfScreen)
+                            {
+                                n = 2;
+                            }
+
+                            var ar = (float)mPicture.Width / (float)mPicture.Height;
+                            var heightLimit = true;
+                            if (mGameCanvas.Width < mGameCanvas.Height * ar)
+                            {
+                                heightLimit = false;
+                            }
+
+                            if (heightLimit)
+                            {
+                                var height = mGameCanvas.Height;
+                                var width = mGameCanvas.Height * ar;
+                                mPicture.SetSize((int)(width / n), (int)(height / n));
+                                Align.Center(mPicture);
+                            }
+                            else
+                            {
+                                var width = mGameCanvas.Width;
+                                var height = width / ar;
+                                mPicture.SetSize((int)(width / n), (int)(height / n));
+                                Align.Center(mPicture);
+                            }
                         }
                     }
-                }
 
-                mPicture.BringToFront();
-                mPicture.Show();
+                    mPicture.BringToFront();
+                    mPicture.Show();
+                }
+                else
+                {
+                    Close();
+                }
             }
             else
             {
-                Close();
+                //If the image is not clickable then make it not take up clicks
+                if (Globals.ContentManager.GetTexture(GameContentManager.TextureType.Image, picture) != null)
+                {
+                    Client.Core.Graphics.DrawFullScreenTextureStretched(Globals.ContentManager.GetTexture(GameContentManager.TextureType.Image, picture));
+                }
             }
         }
 

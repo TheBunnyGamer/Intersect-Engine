@@ -331,20 +331,27 @@ namespace Intersect.Client.Interface.Game
                 mQuestOfferWindow.Hide();
             }
 
-            if (Globals.Picture != null)
+            if (Globals.PictureClickable == false)
             {
-                if (mPictureWindow.Picture != Globals.Picture ||
-                    mPictureWindow.Size != Globals.PictureSize ||
-                    mPictureWindow.Clickable != Globals.PictureClickable)
-                {
-                    mPictureWindow.Setup(Globals.Picture, Globals.PictureSize, Globals.PictureClickable);
-                }
+                mPictureWindow.Setup(Globals.Picture, Globals.PictureSize, Globals.PictureClickable);
             }
             else
             {
-                if (mPictureWindow != null)
+                if (Globals.Picture != null)
                 {
-                    mPictureWindow.Close();
+                    if (mPictureWindow.Picture != Globals.Picture ||
+                    mPictureWindow.Size != Globals.PictureSize ||
+                    mPictureWindow.Clickable != Globals.PictureClickable)
+                    {
+                        mPictureWindow.Setup(Globals.Picture, Globals.PictureSize, Globals.PictureClickable);
+                    }
+                }
+                else
+                {
+                    if (mPictureWindow != null)
+                    {
+                        mPictureWindow.Close();
+                    }
                 }
             }
 
