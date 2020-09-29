@@ -691,18 +691,25 @@ namespace Intersect.Editor.Forms.Editors.Events
 
         private static string GetCommandText(WarpCommand command, MapInstance map)
         {
-            var mapName = Strings.EventCommandList.mapnotfound;
-            for (var i = 0; i < MapList.OrderedMaps.Count; i++)
+            if (command.usingvariableloc == false)
             {
-                if (MapList.OrderedMaps[i].MapId == command.MapId)
+                var mapName = Strings.EventCommandList.mapnotfound;
+                for (var i = 0; i < MapList.OrderedMaps.Count; i++)
                 {
-                    mapName = MapList.OrderedMaps[i].Name;
+                    if (MapList.OrderedMaps[i].MapId == command.MapId)
+                    {
+                        mapName = MapList.OrderedMaps[i].Name;
+                    }
                 }
-            }
 
-            return Strings.EventCommandList.warp.ToString(
-                mapName, command.X, command.Y, Strings.Directions.dir[(int) command.Direction - 1]
-            );
+                return Strings.EventCommandList.warp.ToString(
+                    mapName, command.X, command.Y, Strings.Directions.dir[(int)command.Direction - 1]
+                );
+            }
+            else
+            {
+                return "Warp to variable values";
+            }
         }
 
         private static string GetCommandText(SetMoveRouteCommand command, MapInstance map)

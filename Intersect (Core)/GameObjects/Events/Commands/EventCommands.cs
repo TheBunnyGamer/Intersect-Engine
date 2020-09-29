@@ -572,6 +572,14 @@ namespace Intersect.GameObjects.Events.Commands
 
         public WarpDirection Direction { get; set; } = WarpDirection.Retain;
 
+        public Guid VariableMapID { get; set; } = Guid.NewGuid();
+
+        public Guid VariableXID { get; set; } = Guid.NewGuid();
+
+        public Guid VariableYID { get; set; } = Guid.NewGuid();
+
+        public bool usingvariableloc { get; set; }
+
     }
 
     public class SetMoveRouteCommand : EventCommand

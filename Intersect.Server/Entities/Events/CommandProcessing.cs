@@ -643,10 +643,62 @@ namespace Intersect.Server.Entities.Events
             Stack<CommandInstance> callStack
         )
         {
-            player.Warp(
-                command.MapId, command.X, command.Y,
-                command.Direction == WarpDirection.Retain ? (byte) player.Dir : (byte) (command.Direction - 1)
-            );
+            if (command.usingvariableloc == false)
+            {
+                player.Warp(
+                    command.MapId, command.X, command.Y,
+                    command.Direction == WarpDirection.Retain ? (byte)player.Dir : (byte)(command.Direction - 1)
+                );
+            }
+            else
+            {
+                Guid playermapidvariable = Guid.NewGuid();
+                String playermapidvariabletest;
+                bool breakthisloop = false;
+                for (var i = 0; i < player.Variables.Count; i++)
+                {
+                    if (breakthisloop == true)
+                    {
+                        break;
+                    }
+                    if (player.Variables[i].VariableId == command.VariableMapID)
+                    {
+                        playermapidvariabletest = player.Variables[i].Value;
+                        for (var i2 = 0; i2 < GameObjects.Maps.MapList.MapList.OrderedMaps.Count; i2++)
+                        {
+                            if (GameObjects.Maps.MapList.MapList.OrderedMaps[i].Name == playermapidvariabletest)
+                            {
+                                playermapidvariable = GameObjects.Maps.MapList.MapList.OrderedMaps[i].MapId;
+                                breakthisloop = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                byte playerxidvariable = 0;
+                for (var i = 0; i < player.Variables.Count; i++)
+                {
+                    if (player.Variables[i].VariableId == command.VariableXID)
+                    {
+                        playerxidvariable = (byte)player.Variables[i].Value;
+                    }
+                }
+
+                byte playeryidvariable = 0;
+                for (var i = 0; i < player.Variables.Count; i++)
+                {
+                    if (player.Variables[i].VariableId == command.VariableYID)
+                    {
+                        playeryidvariable = (byte)player.Variables[i].Value;
+                    }
+                }
+
+                player.Warp(
+                     playermapidvariable, playerxidvariable, playeryidvariable,
+                    command.Direction == WarpDirection.Retain ? (byte)player.Dir : (byte)(command.Direction - 1)
+                );
+            }
         }
 
         //Set Move Route Command
