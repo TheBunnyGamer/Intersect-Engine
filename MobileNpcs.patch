@@ -1,0 +1,1774 @@
+From 7473604f90ea783a2e13bde26f06b7523c6738d8 Mon Sep 17 00:00:00 2001
+From: JadinRiverJames <40528979+JadinRiverJames@users.noreply.github.com>
+Date: Mon, 13 Apr 2020 22:30:06 -0600
+Subject: [PATCH] Done and done, bitch2
+
+---
+ Intersect (Core)/GameObjects/NpcBase.cs       |    2 +
+ .../Forms/Editors/frmNpc.Designer.cs          |  215 ++--
+ Intersect.Editor/Forms/Editors/frmNpc.cs      |    5 +
+ Intersect.Editor/Forms/Editors/frmNpc.resx    |   74 +-
+ Intersect.Server/Entities/Npc.cs              |   80 +-
+ Intersect.Server/Intersect.Server.csproj      |    4 +
+ ...20200414015804_AddingMoveRange.Designer.cs | 1038 +++++++++++++++++
+ .../Game/20200414015804_AddingMoveRange.cs    |   23 +
+ .../Game/GameContextModelSnapshot.cs          |    2 +
+ 9 files changed, 1314 insertions(+), 129 deletions(-)
+ create mode 100644 Intersect.Server/Migrations/Game/20200414015804_AddingMoveRange.Designer.cs
+ create mode 100644 Intersect.Server/Migrations/Game/20200414015804_AddingMoveRange.cs
+
+diff --git a/Intersect (Core)/GameObjects/NpcBase.cs b/Intersect (Core)/GameObjects/NpcBase.cs
+index 97c62c85..cce9627f 100644
+--- a/Intersect (Core)/GameObjects/NpcBase.cs	
++++ b/Intersect (Core)/GameObjects/NpcBase.cs	
+@@ -73,6 +73,8 @@ public AnimationBase AttackAnimation
+ 
+         public byte Movement { get; set; }
+ 
++        public int MoveRange { get; set; } = 1;
++
+         public bool Swarm { get; set; }
+ 
+         public byte FleeHealthPercentage { get; set; }
+diff --git a/Intersect.Editor/Forms/Editors/frmNpc.Designer.cs b/Intersect.Editor/Forms/Editors/frmNpc.Designer.cs
+index 3ffdf8c1..7098f312 100644
+--- a/Intersect.Editor/Forms/Editors/frmNpc.Designer.cs
++++ b/Intersect.Editor/Forms/Editors/frmNpc.Designer.cs
+@@ -71,6 +71,11 @@ private void InitializeComponent()
+             this.lblExp = new System.Windows.Forms.Label();
+             this.pnlContainer = new System.Windows.Forms.Panel();
+             this.grpCombat = new DarkUI.Controls.DarkGroupBox();
++            this.grpAttackSpeed = new DarkUI.Controls.DarkGroupBox();
++            this.nudAttackSpeedValue = new DarkUI.Controls.DarkNumericUpDown();
++            this.lblAttackSpeedValue = new System.Windows.Forms.Label();
++            this.cmbAttackSpeedModifier = new DarkUI.Controls.DarkComboBox();
++            this.lblAttackSpeedModifier = new System.Windows.Forms.Label();
+             this.nudCritMultiplier = new DarkUI.Controls.DarkNumericUpDown();
+             this.lblCritMultiplier = new System.Windows.Forms.Label();
+             this.nudScaling = new DarkUI.Controls.DarkNumericUpDown();
+@@ -91,6 +96,8 @@ private void InitializeComponent()
+             this.cmbOnDeathEventKiller = new DarkUI.Controls.DarkComboBox();
+             this.lblOnDeathEventKiller = new System.Windows.Forms.Label();
+             this.grpBehavior = new DarkUI.Controls.DarkGroupBox();
++            this.nbrMoveRange = new DarkUI.Controls.DarkNumericUpDown();
++            this.label1 = new System.Windows.Forms.Label();
+             this.lblFocusDamageDealer = new System.Windows.Forms.Label();
+             this.chkFocusDamageDealer = new DarkUI.Controls.DarkCheckBox();
+             this.nudFlee = new DarkUI.Controls.DarkNumericUpDown();
+@@ -151,11 +158,6 @@ private void InitializeComponent()
+             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+             this.toolStripItemUndo = new System.Windows.Forms.ToolStripButton();
+             this.searchableDarkTreeView1 = new Intersect.Editor.Forms.Controls.SearchableDarkTreeView();
+-            this.grpAttackSpeed = new DarkUI.Controls.DarkGroupBox();
+-            this.nudAttackSpeedValue = new DarkUI.Controls.DarkNumericUpDown();
+-            this.lblAttackSpeedValue = new System.Windows.Forms.Label();
+-            this.cmbAttackSpeedModifier = new DarkUI.Controls.DarkComboBox();
+-            this.lblAttackSpeedModifier = new System.Windows.Forms.Label();
+             this.grpNpcs.SuspendLayout();
+             this.grpGeneral.SuspendLayout();
+             ((System.ComponentModel.ISupportInitialize)(this.nudLevel)).BeginInit();
+@@ -173,12 +175,15 @@ private void InitializeComponent()
+             ((System.ComponentModel.ISupportInitialize)(this.nudStr)).BeginInit();
+             this.pnlContainer.SuspendLayout();
+             this.grpCombat.SuspendLayout();
++            this.grpAttackSpeed.SuspendLayout();
++            ((System.ComponentModel.ISupportInitialize)(this.nudAttackSpeedValue)).BeginInit();
+             ((System.ComponentModel.ISupportInitialize)(this.nudCritMultiplier)).BeginInit();
+             ((System.ComponentModel.ISupportInitialize)(this.nudScaling)).BeginInit();
+             ((System.ComponentModel.ISupportInitialize)(this.nudDamage)).BeginInit();
+             ((System.ComponentModel.ISupportInitialize)(this.nudCritChance)).BeginInit();
+             this.grpCommonEvents.SuspendLayout();
+             this.grpBehavior.SuspendLayout();
++            ((System.ComponentModel.ISupportInitialize)(this.nbrMoveRange)).BeginInit();
+             ((System.ComponentModel.ISupportInitialize)(this.nudFlee)).BeginInit();
+             this.grpConditions.SuspendLayout();
+             this.grpRegen.SuspendLayout();
+@@ -190,8 +195,6 @@ private void InitializeComponent()
+             this.grpNpcVsNpc.SuspendLayout();
+             this.grpSpells.SuspendLayout();
+             this.toolStrip.SuspendLayout();
+-            this.grpAttackSpeed.SuspendLayout();
+-            ((System.ComponentModel.ISupportInitialize)(this.nudAttackSpeedValue)).BeginInit();
+             this.SuspendLayout();
+             // 
+             // grpNpcs
+@@ -780,6 +783,82 @@ private void InitializeComponent()
+             this.grpCombat.TabStop = false;
+             this.grpCombat.Text = "Combat";
+             // 
++            // grpAttackSpeed
++            // 
++            this.grpAttackSpeed.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
++            this.grpAttackSpeed.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
++            this.grpAttackSpeed.Controls.Add(this.nudAttackSpeedValue);
++            this.grpAttackSpeed.Controls.Add(this.lblAttackSpeedValue);
++            this.grpAttackSpeed.Controls.Add(this.cmbAttackSpeedModifier);
++            this.grpAttackSpeed.Controls.Add(this.lblAttackSpeedModifier);
++            this.grpAttackSpeed.ForeColor = System.Drawing.Color.Gainsboro;
++            this.grpAttackSpeed.Location = new System.Drawing.Point(12, 310);
++            this.grpAttackSpeed.Name = "grpAttackSpeed";
++            this.grpAttackSpeed.Size = new System.Drawing.Size(192, 86);
++            this.grpAttackSpeed.TabIndex = 64;
++            this.grpAttackSpeed.TabStop = false;
++            this.grpAttackSpeed.Text = "Attack Speed";
++            // 
++            // nudAttackSpeedValue
++            // 
++            this.nudAttackSpeedValue.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(69)))), ((int)(((byte)(73)))), ((int)(((byte)(74)))));
++            this.nudAttackSpeedValue.ForeColor = System.Drawing.Color.Gainsboro;
++            this.nudAttackSpeedValue.Location = new System.Drawing.Point(60, 58);
++            this.nudAttackSpeedValue.Maximum = new decimal(new int[] {
++            10000,
++            0,
++            0,
++            0});
++            this.nudAttackSpeedValue.Name = "nudAttackSpeedValue";
++            this.nudAttackSpeedValue.Size = new System.Drawing.Size(114, 20);
++            this.nudAttackSpeedValue.TabIndex = 56;
++            this.nudAttackSpeedValue.Value = new decimal(new int[] {
++            0,
++            0,
++            0,
++            0});
++            this.nudAttackSpeedValue.ValueChanged += new System.EventHandler(this.nudAttackSpeedValue_ValueChanged);
++            // 
++            // lblAttackSpeedValue
++            // 
++            this.lblAttackSpeedValue.AutoSize = true;
++            this.lblAttackSpeedValue.Location = new System.Drawing.Point(9, 60);
++            this.lblAttackSpeedValue.Name = "lblAttackSpeedValue";
++            this.lblAttackSpeedValue.Size = new System.Drawing.Size(37, 13);
++            this.lblAttackSpeedValue.TabIndex = 29;
++            this.lblAttackSpeedValue.Text = "Value:";
++            // 
++            // cmbAttackSpeedModifier
++            // 
++            this.cmbAttackSpeedModifier.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(69)))), ((int)(((byte)(73)))), ((int)(((byte)(74)))));
++            this.cmbAttackSpeedModifier.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
++            this.cmbAttackSpeedModifier.BorderStyle = System.Windows.Forms.ButtonBorderStyle.Solid;
++            this.cmbAttackSpeedModifier.ButtonColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(43)))), ((int)(((byte)(43)))));
++            this.cmbAttackSpeedModifier.ButtonIcon = ((System.Drawing.Bitmap)(resources.GetObject("cmbAttackSpeedModifier.ButtonIcon")));
++            this.cmbAttackSpeedModifier.DrawDropdownHoverOutline = false;
++            this.cmbAttackSpeedModifier.DrawFocusRectangle = false;
++            this.cmbAttackSpeedModifier.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
++            this.cmbAttackSpeedModifier.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
++            this.cmbAttackSpeedModifier.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
++            this.cmbAttackSpeedModifier.ForeColor = System.Drawing.Color.Gainsboro;
++            this.cmbAttackSpeedModifier.FormattingEnabled = true;
++            this.cmbAttackSpeedModifier.Location = new System.Drawing.Point(60, 24);
++            this.cmbAttackSpeedModifier.Name = "cmbAttackSpeedModifier";
++            this.cmbAttackSpeedModifier.Size = new System.Drawing.Size(114, 21);
++            this.cmbAttackSpeedModifier.TabIndex = 28;
++            this.cmbAttackSpeedModifier.Text = null;
++            this.cmbAttackSpeedModifier.TextPadding = new System.Windows.Forms.Padding(2);
++            this.cmbAttackSpeedModifier.SelectedIndexChanged += new System.EventHandler(this.cmbAttackSpeedModifier_SelectedIndexChanged);
++            // 
++            // lblAttackSpeedModifier
++            // 
++            this.lblAttackSpeedModifier.AutoSize = true;
++            this.lblAttackSpeedModifier.Location = new System.Drawing.Point(9, 27);
++            this.lblAttackSpeedModifier.Name = "lblAttackSpeedModifier";
++            this.lblAttackSpeedModifier.Size = new System.Drawing.Size(47, 13);
++            this.lblAttackSpeedModifier.TabIndex = 0;
++            this.lblAttackSpeedModifier.Text = "Modifier:";
++            // 
+             // nudCritMultiplier
+             // 
+             this.nudCritMultiplier.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(69)))), ((int)(((byte)(73)))), ((int)(((byte)(74)))));
+@@ -1082,6 +1161,8 @@ private void InitializeComponent()
+             // 
+             this.grpBehavior.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
+             this.grpBehavior.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
++            this.grpBehavior.Controls.Add(this.nbrMoveRange);
++            this.grpBehavior.Controls.Add(this.label1);
+             this.grpBehavior.Controls.Add(this.lblFocusDamageDealer);
+             this.grpBehavior.Controls.Add(this.chkFocusDamageDealer);
+             this.grpBehavior.Controls.Add(this.nudSpawnDuration);
+@@ -1105,10 +1186,39 @@ private void InitializeComponent()
+             this.grpBehavior.TabStop = false;
+             this.grpBehavior.Text = "Behavior:";
+             // 
++            // nbrMoveRange
++            // 
++            this.nbrMoveRange.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(69)))), ((int)(((byte)(73)))), ((int)(((byte)(74)))));
++            this.nbrMoveRange.ForeColor = System.Drawing.Color.Gainsboro;
++            this.nbrMoveRange.Location = new System.Drawing.Point(133, 137);
++            this.nbrMoveRange.Maximum = new decimal(new int[] {
++            50,
++            0,
++            0,
++            0});
++            this.nbrMoveRange.Name = "nbrMoveRange";
++            this.nbrMoveRange.Size = new System.Drawing.Size(87, 20);
++            this.nbrMoveRange.TabIndex = 74;
++            this.nbrMoveRange.Value = new decimal(new int[] {
++            0,
++            0,
++            0,
++            0});
++            this.nbrMoveRange.ValueChanged += new System.EventHandler(this.nbrMoveRange_ValueChanged_1);
++            // 
++            // label1
++            // 
++            this.label1.AutoSize = true;
++            this.label1.Location = new System.Drawing.Point(128, 121);
++            this.label1.Name = "label1";
++            this.label1.Size = new System.Drawing.Size(95, 13);
++            this.label1.TabIndex = 73;
++            this.label1.Text = "Movement Range:";
++            // 
+             // lblFocusDamageDealer
+             // 
+             this.lblFocusDamageDealer.AutoSize = true;
+-            this.lblFocusDamageDealer.Location = new System.Drawing.Point(10, 153);
++            this.lblFocusDamageDealer.Location = new System.Drawing.Point(10, 159);
+             this.lblFocusDamageDealer.Name = "lblFocusDamageDealer";
+             this.lblFocusDamageDealer.Size = new System.Drawing.Size(155, 13);
+             this.lblFocusDamageDealer.TabIndex = 72;
+@@ -1117,7 +1227,7 @@ private void InitializeComponent()
+             // chkFocusDamageDealer
+             // 
+             this.chkFocusDamageDealer.AutoSize = true;
+-            this.chkFocusDamageDealer.Location = new System.Drawing.Point(171, 153);
++            this.chkFocusDamageDealer.Location = new System.Drawing.Point(171, 158);
+             this.chkFocusDamageDealer.Name = "chkFocusDamageDealer";
+             this.chkFocusDamageDealer.Size = new System.Drawing.Size(15, 14);
+             this.chkFocusDamageDealer.TabIndex = 71;
+@@ -1129,7 +1239,7 @@ private void InitializeComponent()
+             this.nudFlee.ForeColor = System.Drawing.Color.Gainsboro;
+             this.nudFlee.Location = new System.Drawing.Point(90, 125);
+             this.nudFlee.Name = "nudFlee";
+-            this.nudFlee.Size = new System.Drawing.Size(80, 20);
++            this.nudFlee.Size = new System.Drawing.Size(36, 20);
+             this.nudFlee.TabIndex = 70;
+             this.nudFlee.Value = new decimal(new int[] {
+             0,
+@@ -1859,82 +1969,6 @@ private void InitializeComponent()
+             this.searchableDarkTreeView1.TabIndex = 46;
+             this.searchableDarkTreeView1.Visible = false;
+             // 
+-            // grpAttackSpeed
+-            // 
+-            this.grpAttackSpeed.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
+-            this.grpAttackSpeed.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
+-            this.grpAttackSpeed.Controls.Add(this.nudAttackSpeedValue);
+-            this.grpAttackSpeed.Controls.Add(this.lblAttackSpeedValue);
+-            this.grpAttackSpeed.Controls.Add(this.cmbAttackSpeedModifier);
+-            this.grpAttackSpeed.Controls.Add(this.lblAttackSpeedModifier);
+-            this.grpAttackSpeed.ForeColor = System.Drawing.Color.Gainsboro;
+-            this.grpAttackSpeed.Location = new System.Drawing.Point(12, 310);
+-            this.grpAttackSpeed.Name = "grpAttackSpeed";
+-            this.grpAttackSpeed.Size = new System.Drawing.Size(192, 86);
+-            this.grpAttackSpeed.TabIndex = 64;
+-            this.grpAttackSpeed.TabStop = false;
+-            this.grpAttackSpeed.Text = "Attack Speed";
+-            // 
+-            // nudAttackSpeedValue
+-            // 
+-            this.nudAttackSpeedValue.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(69)))), ((int)(((byte)(73)))), ((int)(((byte)(74)))));
+-            this.nudAttackSpeedValue.ForeColor = System.Drawing.Color.Gainsboro;
+-            this.nudAttackSpeedValue.Location = new System.Drawing.Point(60, 58);
+-            this.nudAttackSpeedValue.Maximum = new decimal(new int[] {
+-            10000,
+-            0,
+-            0,
+-            0});
+-            this.nudAttackSpeedValue.Name = "nudAttackSpeedValue";
+-            this.nudAttackSpeedValue.Size = new System.Drawing.Size(114, 20);
+-            this.nudAttackSpeedValue.TabIndex = 56;
+-            this.nudAttackSpeedValue.Value = new decimal(new int[] {
+-            0,
+-            0,
+-            0,
+-            0});
+-            this.nudAttackSpeedValue.ValueChanged += new System.EventHandler(this.nudAttackSpeedValue_ValueChanged);
+-            // 
+-            // lblAttackSpeedValue
+-            // 
+-            this.lblAttackSpeedValue.AutoSize = true;
+-            this.lblAttackSpeedValue.Location = new System.Drawing.Point(9, 60);
+-            this.lblAttackSpeedValue.Name = "lblAttackSpeedValue";
+-            this.lblAttackSpeedValue.Size = new System.Drawing.Size(37, 13);
+-            this.lblAttackSpeedValue.TabIndex = 29;
+-            this.lblAttackSpeedValue.Text = "Value:";
+-            // 
+-            // cmbAttackSpeedModifier
+-            // 
+-            this.cmbAttackSpeedModifier.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(69)))), ((int)(((byte)(73)))), ((int)(((byte)(74)))));
+-            this.cmbAttackSpeedModifier.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
+-            this.cmbAttackSpeedModifier.BorderStyle = System.Windows.Forms.ButtonBorderStyle.Solid;
+-            this.cmbAttackSpeedModifier.ButtonColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(43)))), ((int)(((byte)(43)))));
+-            this.cmbAttackSpeedModifier.ButtonIcon = ((System.Drawing.Bitmap)(resources.GetObject("cmbAttackSpeedModifier.ButtonIcon")));
+-            this.cmbAttackSpeedModifier.DrawDropdownHoverOutline = false;
+-            this.cmbAttackSpeedModifier.DrawFocusRectangle = false;
+-            this.cmbAttackSpeedModifier.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+-            this.cmbAttackSpeedModifier.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+-            this.cmbAttackSpeedModifier.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+-            this.cmbAttackSpeedModifier.ForeColor = System.Drawing.Color.Gainsboro;
+-            this.cmbAttackSpeedModifier.FormattingEnabled = true;
+-            this.cmbAttackSpeedModifier.Location = new System.Drawing.Point(60, 24);
+-            this.cmbAttackSpeedModifier.Name = "cmbAttackSpeedModifier";
+-            this.cmbAttackSpeedModifier.Size = new System.Drawing.Size(114, 21);
+-            this.cmbAttackSpeedModifier.TabIndex = 28;
+-            this.cmbAttackSpeedModifier.Text = null;
+-            this.cmbAttackSpeedModifier.TextPadding = new System.Windows.Forms.Padding(2);
+-            this.cmbAttackSpeedModifier.SelectedIndexChanged += new System.EventHandler(this.cmbAttackSpeedModifier_SelectedIndexChanged);
+-            // 
+-            // lblAttackSpeedModifier
+-            // 
+-            this.lblAttackSpeedModifier.AutoSize = true;
+-            this.lblAttackSpeedModifier.Location = new System.Drawing.Point(9, 27);
+-            this.lblAttackSpeedModifier.Name = "lblAttackSpeedModifier";
+-            this.lblAttackSpeedModifier.Size = new System.Drawing.Size(47, 13);
+-            this.lblAttackSpeedModifier.TabIndex = 0;
+-            this.lblAttackSpeedModifier.Text = "Modifier:";
+-            // 
+             // FrmNpc
+             // 
+             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+@@ -1980,6 +2014,9 @@ private void InitializeComponent()
+             this.pnlContainer.ResumeLayout(false);
+             this.grpCombat.ResumeLayout(false);
+             this.grpCombat.PerformLayout();
++            this.grpAttackSpeed.ResumeLayout(false);
++            this.grpAttackSpeed.PerformLayout();
++            ((System.ComponentModel.ISupportInitialize)(this.nudAttackSpeedValue)).EndInit();
+             ((System.ComponentModel.ISupportInitialize)(this.nudCritMultiplier)).EndInit();
+             ((System.ComponentModel.ISupportInitialize)(this.nudScaling)).EndInit();
+             ((System.ComponentModel.ISupportInitialize)(this.nudDamage)).EndInit();
+@@ -1988,6 +2025,7 @@ private void InitializeComponent()
+             this.grpCommonEvents.PerformLayout();
+             this.grpBehavior.ResumeLayout(false);
+             this.grpBehavior.PerformLayout();
++            ((System.ComponentModel.ISupportInitialize)(this.nbrMoveRange)).EndInit();
+             ((System.ComponentModel.ISupportInitialize)(this.nudFlee)).EndInit();
+             this.grpConditions.ResumeLayout(false);
+             this.grpRegen.ResumeLayout(false);
+@@ -2004,9 +2042,6 @@ private void InitializeComponent()
+             this.grpSpells.PerformLayout();
+             this.toolStrip.ResumeLayout(false);
+             this.toolStrip.PerformLayout();
+-            this.grpAttackSpeed.ResumeLayout(false);
+-            this.grpAttackSpeed.PerformLayout();
+-            ((System.ComponentModel.ISupportInitialize)(this.nudAttackSpeedValue)).EndInit();
+             this.ResumeLayout(false);
+ 
+         }
+@@ -2136,5 +2171,7 @@ private void InitializeComponent()
+         private System.Windows.Forms.Label lblAttackSpeedValue;
+         private DarkComboBox cmbAttackSpeedModifier;
+         private System.Windows.Forms.Label lblAttackSpeedModifier;
++        private DarkNumericUpDown nbrMoveRange;
++        private System.Windows.Forms.Label label1;
+     }
+ }
+\ No newline at end of file
+diff --git a/Intersect.Editor/Forms/Editors/frmNpc.cs b/Intersect.Editor/Forms/Editors/frmNpc.cs
+index a290031d..cedebf4b 100644
+--- a/Intersect.Editor/Forms/Editors/frmNpc.cs
++++ b/Intersect.Editor/Forms/Editors/frmNpc.cs
+@@ -254,6 +254,7 @@ private void UpdateEditor()
+                 }
+ 
+                 nudSightRange.Value = mEditorItem.SightRange;
++                nbrMoveRange.Value = mEditorItem.MoveRange;
+                 cmbMovement.SelectedIndex = Math.Min(mEditorItem.Movement, cmbMovement.Items.Count - 1);
+                 chkSwarm.Checked = mEditorItem.Swarm;
+                 nudFlee.Value = mEditorItem.FleeHealthPercentage;
+@@ -1109,6 +1110,10 @@ private void txtSearch_Click(object sender, EventArgs e)
+ 
+         #endregion
+ 
++        private void nbrMoveRange_ValueChanged_1(object sender, EventArgs e)
++        {
++            mEditorItem.MoveRange = (int)nbrMoveRange.Value;
++        }
+     }
+ 
+ }
+diff --git a/Intersect.Editor/Forms/Editors/frmNpc.resx b/Intersect.Editor/Forms/Editors/frmNpc.resx
+index 3beb1913..aa4cf569 100644
+--- a/Intersect.Editor/Forms/Editors/frmNpc.resx
++++ b/Intersect.Editor/Forms/Editors/frmNpc.resx
+@@ -125,51 +125,51 @@
+         AAEAAAD/////AQAAAAAAAAAMAgAAAFdTeXN0ZW0uV2luZG93cy5Gb3JtcywgVmVyc2lvbj00LjAuMC4w
+         LCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPWI3N2E1YzU2MTkzNGUwODkFAQAAACZTeXN0
+         ZW0uV2luZG93cy5Gb3Jtcy5JbWFnZUxpc3RTdHJlYW1lcgEAAAAERGF0YQcCAgAAAAkDAAAADwMAAAAY
+-        CwAAAk1TRnQBSQFMAgEBAgEAAbABAQGwAQEBEAEAARABAAT/ASEBAAj/AUIBTQE2BwABNgMAASgDAAFA
++        CwAAAk1TRnQBSQFMAgEBAgEAAcgBAQHIAQEBEAEAARABAAT/ASEBAAj/AUIBTQE2BwABNgMAASgDAAFA
+         AwABEAMAAQEBAAEgBgABEFoAA/YB/wP2Af8D9gH/A/YB/wP2Af8D9gH/A/YB/wP2Af8D9gH/A/YB/wP2
+         Af8D9gH/A/YB/4wAAyEBMAMqAUADKgFAAyoBQAMqAUADKgFAAyoBQAMqAUADKgFAAyoBQAMqAUADKgFA
+-        AyoBQAMqAUAIAAP2Af8DMgH/AzIB/wMyAf8DMgH/AzIB/wMyAf8DMgH/AzIB/wMyAf8DMgH/AzIB/wP2
++        AyoBQAMqAUAIAAP2Af8DLwH/Ay8B/wMvAf8DLwH/Ay8B/wMvAf8DLwH/Ay8B/wMvAf8DLwH/Ay8B/wP2
+         Af+IAAMMARAB7gHyAfQB/wP2Af8D9gH/A/YB/wP2Af8D9gH/A/YB/wP2Af8D9gH/A/YB/wP2Af8D9gH/
+-        A/YB/wP2Af8IAAP2Af8DMgH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8B8QHvAfAB/wHx
+-        Ae8B8AH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/AzIB/wP2Af+IAANAAXAByAHeAewB/wFEAbYB3AH/
+-        AUQBtgHcAf8BRAG2AdwB/wFEAbYB3AH/AUQBtgHcAf8BRAG2AdwB/wFEAbYB3AH/AUQBtgHcAf8BRAG2
+-        AdwB/wFEAbYB3AH/AbYB0wHmAf8BRAG2AdwB/wP2Af8IAAP2Af8DMgH/AfEB7wHwAf8B8QHvAfAB/wHx
+-        Ae8B8AH/AcUBxAHFAf8BhAKDAf8BxQHEAcUB/wHxAe8B8AH/AfEB7wHwAf8B8QHvAfAB/wMyAf8D9gH/
+-        iAADXAHfAZEBwgHhAf8BRAG2AdwB/wFEAbYB3AH/AUQBtgHcAf8BRAG2AdwB/wFEAbYB3AH/AUQBtgHc
+-        Af8BRAG2AdwB/wFEAbYB3AH/AUQBtgHcAf8BiQG9Ad8B/wHxAe8B8AH/AUQBtgHcAf8D9gH/CAAD9gH/
+-        AzIB/wHxAe8B8AH/AdsB2QHaAf8BaQJoAf8BmgKZAf8DMgH/AZoCmQH/AWkCaAH/AdsB2QHaAf8B8QHv
+-        AfAB/wMyAf8D9gH/hAADKgFAAd8B6gHxAf8BRAG2AdwB/wFEAbYB3AH/AUQBtgHcAf8BRAG2AdwB/wFE
+-        AbYB3AH/AUQBtgHcAf8BRAG2AdwB/wFEAbYB3AH/AUQBtgHcAf8BRAG2AdwB/wHTAeEB6wH/AfEB7wHw
+-        Af8BRAG2AdwB/wP2Af8IAAP2Af8DMgH/AfEB7wHwAf8DMgH/AdsB2QHaAf8B8QHvAfAB/wMyAf8B8QHv
+-        AfAB/wHbAdkB2gH/AzIB/wHxAe8B8AH/AzIB/wP2Af+EAANRAZ8BqQHOAeYB/wFEAbYB3AH/AUQBtgHc
+-        Af8BRAG2AdwB/wFEAbYB3AH/AUQBtgHcAf8BRAG2AdwB/wFEAbYB3AH/AUQBtgHcAf8BRAG2AdwB/wGf
+-        AcgB4gH/AfEB7wHwAf8B8QHvAfAB/wFEAbYB3AH/A/YB/wgAA/YB/wMyAf8B8QHvAfAB/wMyAf8B8QHv
+-        AfAB/wHxAe8B8AH/AzIB/wHxAe8B8AH/AfEB7wHwAf8DMgH/AfEB7wHwAf8DMgH/A/YB/4QAA/YB/wGC
+-        AboB3gH/AUQBtgHcAf8BRAG2AdwB/wFEAbYB3AH/AUQBtgHcAf8BRAG2AdwB/wFEAbYB3AH/AUQBtgHc
+-        Af8BRAG2AdwB/wFEAbYB3AH/AeIB6AHuAf8B8QHvAfAB/wHxAe8B8AH/AUQBtgHcAf8D9gH/CAAD9gH/
+-        AzIB/wHxAe8B8AH/AzIB/wHFAcQBxQH/AV4BXQFeAf8BmgKZAf8BXgFdAV4B/wHFAcQBxQH/AzIB/wHx
+-        Ae8B8AH/AzIB/wP2Af+EAAP2Af8D9gH/AUQBtgHcAf8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8B8QHv
++        A/YB/wP2Af8IAAP2Af8DLwH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8B8QHvAfAB/wHx
++        Ae8B8AH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/Ay8B/wP2Af+IAANAAXAByAHeAewB/wFBAbYB3AH/
++        AUEBtgHcAf8BQQG2AdwB/wFBAbYB3AH/AUEBtgHcAf8BQQG2AdwB/wFBAbYB3AH/AUEBtgHcAf8BQQG2
++        AdwB/wFBAbYB3AH/AbYB0wHmAf8BQQG2AdwB/wP2Af8IAAP2Af8DLwH/AfEB7wHwAf8B8QHvAfAB/wHx
++        Ae8B8AH/AcUBxAHFAf8BhAKDAf8BxQHEAcUB/wHxAe8B8AH/AfEB7wHwAf8B8QHvAfAB/wMvAf8D9gH/
++        iAADXAHfAZEBwgHhAf8BQQG2AdwB/wFBAbYB3AH/AUEBtgHcAf8BQQG2AdwB/wFBAbYB3AH/AUEBtgHc
++        Af8BQQG2AdwB/wFBAbYB3AH/AUEBtgHcAf8BiQG9Ad8B/wHxAe8B8AH/AUEBtgHcAf8D9gH/CAAD9gH/
++        Ay8B/wHxAe8B8AH/AdsB2QHaAf8BZgJlAf8BmgKZAf8DLwH/AZoCmQH/AWYCZQH/AdsB2QHaAf8B8QHv
++        AfAB/wMvAf8D9gH/hAADKgFAAd8B6gHxAf8BQQG2AdwB/wFBAbYB3AH/AUEBtgHcAf8BQQG2AdwB/wFB
++        AbYB3AH/AUEBtgHcAf8BQQG2AdwB/wFBAbYB3AH/AUEBtgHcAf8BQQG2AdwB/wHTAeEB6wH/AfEB7wHw
++        Af8BQQG2AdwB/wP2Af8IAAP2Af8DLwH/AfEB7wHwAf8DLwH/AdsB2QHaAf8B8QHvAfAB/wMvAf8B8QHv
++        AfAB/wHbAdkB2gH/Ay8B/wHxAe8B8AH/Ay8B/wP2Af+EAANRAZ8BqQHOAeYB/wFBAbYB3AH/AUEBtgHc
++        Af8BQQG2AdwB/wFBAbYB3AH/AUEBtgHcAf8BQQG2AdwB/wFBAbYB3AH/AUEBtgHcAf8BQQG2AdwB/wGf
++        AcgB4gH/AfEB7wHwAf8B8QHvAfAB/wFBAbYB3AH/A/YB/wgAA/YB/wMvAf8B8QHvAfAB/wMvAf8B8QHv
++        AfAB/wHxAe8B8AH/Ay8B/wHxAe8B8AH/AfEB7wHwAf8DLwH/AfEB7wHwAf8DLwH/A/YB/4QAA/YB/wGC
++        AboB3gH/AUEBtgHcAf8BQQG2AdwB/wFBAbYB3AH/AUEBtgHcAf8BQQG2AdwB/wFBAbYB3AH/AUEBtgHc
++        Af8BQQG2AdwB/wFBAbYB3AH/AeIB6AHuAf8B8QHvAfAB/wHxAe8B8AH/AUEBtgHcAf8D9gH/CAAD9gH/
++        Ay8B/wHxAe8B8AH/Ay8B/wHFAcQBxQH/AVsBWgFbAf8BmgKZAf8BWwFaAVsB/wHFAcQBxQH/Ay8B/wHx
++        Ae8B8AH/Ay8B/wP2Af+EAAP2Af8D9gH/AUEBtgHcAf8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8B8QHv
+         AfAB/wHxAe8B8AH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/
+-        AUQBtgHcAf8D9gH/CAAD9gH/AzIB/wHxAe8B8AH/AzIB/wFpAmgB/wHmAeQB5QH/AfEB7wHwAf8B5gHk
+-        AeUB/wFpAmgB/wMyAf8B8QHvAfAB/wMyAf8D9gH/iAAD9gH/AUQBtgHcAf8B8QHvAfAB/wHxAe8B8AH/
++        AUEBtgHcAf8D9gH/CAAD9gH/Ay8B/wHxAe8B8AH/Ay8B/wFmAmUB/wHmAeQB5QH/AfEB7wHwAf8B5gHk
++        AeUB/wFmAmUB/wMvAf8B8QHvAfAB/wMvAf8D9gH/iAAD9gH/AUEBtgHcAf8B8QHvAfAB/wHxAe8B8AH/
+         AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8B8QHv
+-        AfAB/wHxAe8B8AH/AUQBtgHcAf8D9gH/CAAD9gH/AzIB/wHxAe8B8AH/AdsB2QHaAf8BaQJoAf8BmgKZ
+-        Af8B2wHZAdoB/wGaApkB/wFpAmgB/wHbAdkB2gH/AfEB7wHwAf8DMgH/A/YB/4gAA/YB/wFEAbYB3AH/
++        AfAB/wHxAe8B8AH/AUEBtgHcAf8D9gH/CAAD9gH/Ay8B/wHxAe8B8AH/AdsB2QHaAf8BZgJlAf8BmgKZ
++        Af8B2wHZAdoB/wGaApkB/wFmAmUB/wHbAdkB2gH/AfEB7wHwAf8DLwH/A/YB/4gAA/YB/wFBAbYB3AH/
+         AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8B8QHv
+-        AfAB/wHxAe8B8AH/AfEB7wHwAf8B8QHvAfAB/wFEAbYB3AH/A/YB/wgAA/YB/wMyAf8B8QHvAfAB/wHx
++        AfAB/wHxAe8B8AH/AfEB7wHwAf8B8QHvAfAB/wFBAbYB3AH/A/YB/wgAA/YB/wMvAf8B8QHvAfAB/wHx
+         Ae8B8AH/AfEB7wHwAf8BxQHEAcUB/wGEAoMB/wHFAcQBxQH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/
+-        AzIB/wP2Af+IAAP2Af8BRAG2AdwB/wFEAbYB3AH/AUQBtgHcAf8BRAG2AdwB/wHiAegB7gH/AfEB7wHw
+-        Af8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8BRAG2AdwB/wP2
+-        Af8IAAP2Af8DMgH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/
+-        AzIB/wMyAf8DMgH/A4YB/wNwAe+IAAP2Af8D9gH/A/YB/wP2Af8BigG+Ad8B/wGnAcsB5AH/AfEB7wHw
+-        Af8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8BRAG2AdwB/wP2
+-        Af8IAAP2Af8DMgH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/
+-        AzIB/wMyAf8DhgH/A3AB7wMhATCUAANcAd8ByAHeAewB/wFEAbYB3AH/AUQBtgHcAf8BRAG2AdwB/wFE
+-        AbYB3AH/AUQBtgHcAf8BRAG2AdwB/wFEAbYB3AH/AUQBtgHcAf8BRAG2AdwB/wP2Af8IAAP2Af8DMgH/
+-        AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/AzIB/wOGAf8DcAHv
++        Ay8B/wP2Af+IAAP2Af8BQQG2AdwB/wFBAbYB3AH/AUEBtgHcAf8BQQG2AdwB/wHiAegB7gH/AfEB7wHw
++        Af8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8BQQG2AdwB/wP2
++        Af8IAAP2Af8DLwH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/
++        Ay8B/wMvAf8DLwH/A4YB/wNoAe+IAAP2Af8D9gH/A/YB/wP2Af8BigG+Ad8B/wGnAcsB5AH/AfEB7wHw
++        Af8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8BQQG2AdwB/wP2
++        Af8IAAP2Af8DLwH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/
++        Ay8B/wMvAf8DhgH/A2gB7wMhATCUAANcAd8ByAHeAewB/wFBAbYB3AH/AUEBtgHcAf8BQQG2AdwB/wFB
++        AbYB3AH/AUEBtgHcAf8BQQG2AdwB/wFBAbYB3AH/AUEBtgHcAf8BQQG2AdwB/wP2Af8IAAP2Af8DLwH/
++        AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/AfEB7wHwAf8B8QHvAfAB/wHxAe8B8AH/Ay8B/wOGAf8DaAHv
+         AyEBMJgAAzoBYAP2Af8D9gH/A/YB/wP2Af8D9gH/A/YB/wP2Af8D9gH/A/YB/wP2Af8D9gH/CAAD9gH/
+-        AzIB/wMyAf8DMgH/AzIB/wMyAf8DMgH/AzIB/wOGAf8DcAHvAyEBMNQAA/YB/wP2Af8D9gH/A/YB/wP2
+-        Af8D9gH/A/YB/wP2Af8DcAHvAyEBMJAAAUIBTQE+BwABPgMAASgDAAFAAwABEAMAAQEBAAEBBQABgBcA
++        Ay8B/wMvAf8DLwH/Ay8B/wMvAf8DLwH/Ay8B/wOGAf8DaAHvAyEBMNQAA/YB/wP2Af8D9gH/A/YB/wP2
++        Af8D9gH/A/YB/wP2Af8DaAHvAyEBMJAAAUIBTQE+BwABPgMAASgDAAFAAwABEAMAAQEBAAEBBQABgBcA
+         A/8BAAL/AcABAQQAAcABAAHAAQEEAAGAAQABwAEBBAABgAEAAcABAQQAAYABAAHAAQEGAAHAAQEGAAHA
+         AQEGAAHAAQEGAAHAAQEEAAGAAQABwAEBBAABgAEAAcABAQQAAYABAAHAAQEEAAGAAQABwAEBBAAB8AEA
+         AcABAwQAAfABAAHAAQcEAAL/AcABDwQACw==
+diff --git a/Intersect.Server/Entities/Npc.cs b/Intersect.Server/Entities/Npc.cs
+index 2762a000..7462b48d 100644
+--- a/Intersect.Server/Entities/Npc.cs
++++ b/Intersect.Server/Entities/Npc.cs
+@@ -3,9 +3,11 @@
+ using System.Collections.Generic;
+ using System.Linq;
+ using System.Threading.Tasks;
++using System.Numerics;
+ 
+ using Intersect.Enums;
+ using Intersect.GameObjects;
++using Intersect.GameObjects.Maps;
+ using Intersect.Logging;
+ using Intersect.Network.Packets.Server;
+ using Intersect.Server.Database;
+@@ -43,6 +45,7 @@ public class Npc : Entity
+         private Task mPathfindingTask;
+ 
+         public byte Range;
++        public byte MRange;
+ 
+         //Respawn/Despawn
+         public long RespawnTime;
+@@ -50,6 +53,10 @@ public class Npc : Entity
+         public long FindTargetWaitTime;
+         public int FindTargetDelay = 500;
+ 
++        public byte[] moveTarget = new byte[2];
++        public Guid moveTargetMap;
++        long NextPathWaitTime;
++
+         public Npc([NotNull] NpcBase myBase, bool despawnable = false) : base()
+         {
+             Name = myBase.Name;
+@@ -95,6 +102,7 @@ public Npc([NotNull] NpcBase myBase, bool despawnable = false) : base()
+             }
+ 
+             Range = (byte) myBase.SightRange;
++            MRange = (byte)myBase.MoveRange;
+             mPathFinder = new Pathfinder(this);
+         }
+ 
+@@ -402,6 +410,11 @@ private static bool PredicateUnableToCastSpells(Status status)
+ 
+         private void TryCastSpells()
+         {
++            // There's not even a fucking target check here lol. Good god
++            if (Target == null)
++            {
++                return;
++            }
+             // Check if NPC is stunned/sleeping
+             if (IsStunnedOrSleeping)
+             {
+@@ -669,6 +682,23 @@ public override void Update(long timeMs)
+                     }
+                 }
+ 
++                // 19 11 25 //
++                // 
++                if (MRange > 1 && Target == null)
++                {
++                    if (moveTargetMap == Guid.Empty)
++                    {
++                        FindMoveTarget();
++                    }
++                    else
++                    {
++                        targetMap = moveTargetMap;
++                        targetX = (int)moveTarget[0];
++                        targetY = (int)moveTarget[1];
++                        targetZ = Z;
++                    }
++                }
++
+                 if (targetMap != Guid.Empty)
+                 {
+                     //Check if target map is on one of the surrounding maps, if not then we are not even going to look.
+@@ -686,12 +716,14 @@ public override void Update(long timeMs)
+                                 if (x == MapInstance.Get(MapId).SurroundingMaps.Count - 1)
+                                 {
+                                     targetMap = Guid.Empty;
++                                    moveTargetMap = Guid.Empty;
+                                 }
+                             }
+                         }
+                         else
+                         {
+                             targetMap = Guid.Empty;
++                            moveTargetMap = Guid.Empty;
+                         }
+                     }
+                 }
+@@ -776,20 +808,22 @@ public override void Update(long timeMs)
+                                 case PathfinderResult.OutOfRange:
+                                     RemoveTarget();
+                                     targetMap = Guid.Empty;
+-
++                                    moveTargetMap = Guid.Empty;
+                                     break;
+                                 case PathfinderResult.NoPathToTarget:
+                                     TryFindNewTarget(timeMs, Target?.Id ?? Guid.Empty);
+                                     targetMap = Guid.Empty;
+-
++                                    moveTargetMap = Guid.Empty;
+                                     break;
+                                 case PathfinderResult.Failure:
+                                     targetMap = Guid.Empty;
++                                    moveTargetMap = Guid.Empty;
+                                     RemoveTarget();
+ 
+                                     break;
+                                 case PathfinderResult.Wait:
+                                     targetMap = Guid.Empty;
++                                    moveTargetMap = Guid.Empty;
+ 
+                                     break;
+                                 default:
+@@ -841,7 +875,7 @@ public override void Update(long timeMs)
+                                 }
+                             }
+ 
+-                            if (!fleed)
++                            if (!fleed && Target != null)
+                             {
+                                 if (Dir != DirToEnemy(Target) && DirToEnemy(Target) != -1)
+                                 {
+@@ -862,6 +896,12 @@ public override void Update(long timeMs)
+                                     }
+                                 }
+                             }
++
++                            if (!fleed && Target == null)
++                            {
++                                moveTargetMap = Guid.Empty;
++                                NextPathWaitTime = Globals.Timing.TimeMs + Randomization.Next(500, 2000);
++                            }
+                         }
+                     }
+                 }
+@@ -872,6 +912,11 @@ public override void Update(long timeMs)
+                     return;
+                 }
+ 
++                if (MRange > 1)
++                {
++                    return;
++                }
++
+                 if (LastRandomMove >= Globals.Timing.TimeMs || CastTime > 0)
+                 {
+                     return;
+@@ -1021,6 +1066,35 @@ public bool ShouldAttackPlayerOnSight(Player en)
+             return false;
+         }
+ 
++        
++        public void FindMoveTarget()
++        {
++            if (NextPathWaitTime > Globals.Timing.TimeMs)
++            {
++                moveTargetMap = Guid.Empty;
++                moveTarget[0] = 0;
++                moveTarget[0] = 0;
++                return;
++            }
++      
++			 Random r = new Random();
++			 Random r2 = new Random();
++            int x = r.Next(-MRange, MRange);
++            int y = r2.Next(-MRange, MRange);  
++     
++            var tile = new TileHelper(MapId, X, Y);
++            if (tile.Translate(x, y)) {
++                moveTargetMap = tile.GetMapId();
++                moveTarget[0] = tile.GetX();
++                moveTarget[1] = tile.GetY();
++            }
++            else
++            {
++                moveTargetMap = Guid.Empty;
++                moveTarget[0] = 0;
++                moveTarget[0] = 0;
++            }
++        }
+         private void TryFindNewTarget(long timeMs, Guid avoidId = new Guid())
+         {
+             if (FindTargetWaitTime > timeMs)
+diff --git a/Intersect.Server/Intersect.Server.csproj b/Intersect.Server/Intersect.Server.csproj
+index 1bbee3dc..03982198 100644
+--- a/Intersect.Server/Intersect.Server.csproj
++++ b/Intersect.Server/Intersect.Server.csproj
+@@ -480,6 +480,10 @@
+     <Compile Include="Entities\Pathfinding\SpatialAStar.cs" />
+     <Compile Include="Entities\Pathfinding\PathfinderTarget.cs" />
+     <Compile Include="Entities\Pathfinding\PriorityQueue.cs" />
++    <Compile Include="Migrations\Game\20200414015804_AddingMoveRange.cs" />
++    <Compile Include="Migrations\Game\20200414015804_AddingMoveRange.designer.cs">
++      <DependentUpon>20200414015804_AddingMoveRange.cs</DependentUpon>
++    </Compile>
+     <Compile Include="Networking\Client.cs" />
+     <Compile Include="Entities\Npc.cs" />
+     <Compile Include="Networking\Helpers\NetDebug.cs" />
+diff --git a/Intersect.Server/Migrations/Game/20200414015804_AddingMoveRange.Designer.cs b/Intersect.Server/Migrations/Game/20200414015804_AddingMoveRange.Designer.cs
+new file mode 100644
+index 00000000..2dcb4a2e
+--- /dev/null
++++ b/Intersect.Server/Migrations/Game/20200414015804_AddingMoveRange.Designer.cs
+@@ -0,0 +1,1038 @@
++﻿// <auto-generated />
++using System;
++using Intersect.Server.Database.GameData;
++using Microsoft.EntityFrameworkCore;
++using Microsoft.EntityFrameworkCore.Infrastructure;
++using Microsoft.EntityFrameworkCore.Migrations;
++using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
++
++namespace Intersect.Server.Migrations.Game
++{
++    [DbContext(typeof(GameContext))]
++    [Migration("20200414015804_AddingMoveRange")]
++    partial class AddingMoveRange
++    {
++        protected override void BuildTargetModel(ModelBuilder modelBuilder)
++        {
++#pragma warning disable 612, 618
++            modelBuilder
++                .HasAnnotation("ProductVersion", "2.1.3-rtm-32065");
++
++            modelBuilder.Entity("Intersect.GameObjects.AnimationBase", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd();
++
++                    b.Property<bool>("CompleteSound");
++
++                    b.Property<string>("Folder");
++
++                    b.Property<string>("Name");
++
++                    b.Property<string>("Sound");
++
++                    b.Property<long>("TimeCreated");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("Animations");
++                });
++
++            modelBuilder.Entity("Intersect.GameObjects.ClassBase", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd();
++
++                    b.Property<Guid>("AttackAnimationId")
++                        .HasColumnName("AttackAnimation");
++
++                    b.Property<int>("AttackSpeedModifier");
++
++                    b.Property<int>("AttackSpeedValue");
++
++                    b.Property<long>("BaseExp");
++
++                    b.Property<int>("BasePoints");
++
++                    b.Property<int>("CritChance");
++
++                    b.Property<double>("CritMultiplier");
++
++                    b.Property<int>("Damage");
++
++                    b.Property<int>("DamageType");
++
++                    b.Property<long>("ExpIncrease");
++
++                    b.Property<string>("ExpOverridesJson")
++                        .HasColumnName("ExperienceOverrides");
++
++                    b.Property<string>("Folder");
++
++                    b.Property<bool>("IncreasePercentage");
++
++                    b.Property<string>("JsonBaseStats")
++                        .HasColumnName("BaseStats");
++
++                    b.Property<string>("JsonBaseVitals")
++                        .HasColumnName("BaseVitals");
++
++                    b.Property<string>("JsonItems")
++                        .HasColumnName("Items");
++
++                    b.Property<string>("JsonSpells")
++                        .HasColumnName("Spells");
++
++                    b.Property<string>("JsonSprites")
++                        .HasColumnName("Sprites");
++
++                    b.Property<bool>("Locked");
++
++                    b.Property<string>("Name");
++
++                    b.Property<int>("PointIncrease");
++
++                    b.Property<string>("RegenJson")
++                        .HasColumnName("VitalRegen");
++
++                    b.Property<int>("Scaling");
++
++                    b.Property<int>("ScalingStat");
++
++                    b.Property<int>("SpawnDir");
++
++                    b.Property<Guid>("SpawnMapId")
++                        .HasColumnName("SpawnMap");
++
++                    b.Property<int>("SpawnX");
++
++                    b.Property<int>("SpawnY");
++
++                    b.Property<string>("StatIncreaseJson")
++                        .HasColumnName("StatIncreases");
++
++                    b.Property<long>("TimeCreated");
++
++                    b.Property<string>("VitalIncreaseJson")
++                        .HasColumnName("VitalIncreases");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("Classes");
++                });
++
++            modelBuilder.Entity("Intersect.GameObjects.Crafting.CraftBase", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd();
++
++                    b.Property<string>("Folder");
++
++                    b.Property<string>("IngredientsJson")
++                        .HasColumnName("Ingredients");
++
++                    b.Property<Guid>("ItemId");
++
++                    b.Property<string>("Name");
++
++                    b.Property<int>("Quantity");
++
++                    b.Property<int>("Time");
++
++                    b.Property<long>("TimeCreated");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("Crafts");
++                });
++
++            modelBuilder.Entity("Intersect.GameObjects.CraftingTableBase", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd();
++
++                    b.Property<string>("CraftsJson")
++                        .HasColumnName("Crafts");
++
++                    b.Property<string>("Folder");
++
++                    b.Property<string>("Name");
++
++                    b.Property<long>("TimeCreated");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("CraftingTables");
++                });
++
++            modelBuilder.Entity("Intersect.GameObjects.Events.EventBase", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd();
++
++                    b.Property<bool>("CommonEvent");
++
++                    b.Property<string>("Folder");
++
++                    b.Property<bool>("Global");
++
++                    b.Property<Guid>("MapId");
++
++                    b.Property<string>("Name");
++
++                    b.Property<string>("PagesJson")
++                        .HasColumnName("Pages");
++
++                    b.Property<int>("SpawnX");
++
++                    b.Property<int>("SpawnY");
++
++                    b.Property<long>("TimeCreated");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("Events");
++                });
++
++            modelBuilder.Entity("Intersect.GameObjects.ItemBase", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd();
++
++                    b.Property<Guid>("AnimationId")
++                        .HasColumnName("Animation");
++
++                    b.Property<Guid>("AttackAnimationId")
++                        .HasColumnName("AttackAnimation");
++
++                    b.Property<int>("AttackSpeedModifier");
++
++                    b.Property<int>("AttackSpeedValue");
++
++                    b.Property<bool>("Bound");
++
++                    b.Property<int>("Cooldown");
++
++                    b.Property<int>("CritChance");
++
++                    b.Property<double>("CritMultiplier");
++
++                    b.Property<int>("Damage");
++
++                    b.Property<int>("DamageType");
++
++                    b.Property<string>("Description");
++
++                    b.Property<bool>("DestroySpell");
++
++                    b.Property<Guid>("EquipmentAnimationId")
++                        .HasColumnName("EquipmentAnimation");
++
++                    b.Property<int>("EquipmentSlot");
++
++                    b.Property<Guid>("EventId")
++                        .HasColumnName("Event");
++
++                    b.Property<string>("FemalePaperdoll");
++
++                    b.Property<string>("Folder");
++
++                    b.Property<string>("Icon");
++
++                    b.Property<int>("ItemType");
++
++                    b.Property<string>("JsonUsageRequirements")
++                        .HasColumnName("UsageRequirements");
++
++                    b.Property<string>("MalePaperdoll");
++
++                    b.Property<string>("Name");
++
++                    b.Property<string>("PercentageStatsJson")
++                        .HasColumnName("PercentageStatsGiven");
++
++                    b.Property<string>("PercentageVitalsJson")
++                        .HasColumnName("PercentageVitalsGiven");
++
++                    b.Property<int>("Price");
++
++                    b.Property<Guid>("ProjectileId")
++                        .HasColumnName("Projectile");
++
++                    b.Property<bool>("QuickCast");
++
++                    b.Property<int>("Rarity");
++
++                    b.Property<int>("Scaling");
++
++                    b.Property<int>("ScalingStat");
++
++                    b.Property<int>("SlotCount");
++
++                    b.Property<int>("Speed");
++
++                    b.Property<Guid>("SpellId")
++                        .HasColumnName("Spell");
++
++                    b.Property<bool>("Stackable");
++
++                    b.Property<int>("StatGrowth");
++
++                    b.Property<string>("StatsJson")
++                        .HasColumnName("StatsGiven");
++
++                    b.Property<long>("TimeCreated");
++
++                    b.Property<int>("Tool");
++
++                    b.Property<bool>("TwoHanded");
++
++                    b.Property<string>("VitalsJson")
++                        .HasColumnName("VitalsGiven");
++
++                    b.Property<string>("VitalsRegenJson")
++                        .HasColumnName("VitalsRegen");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("Items");
++                });
++
++            modelBuilder.Entity("Intersect.GameObjects.Maps.MapList.MapList", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd();
++
++                    b.Property<string>("JsonData")
++                        .HasColumnName("JsonData");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("MapFolders");
++                });
++
++            modelBuilder.Entity("Intersect.GameObjects.NpcBase", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd();
++
++                    b.Property<bool>("Aggressive");
++
++                    b.Property<bool>("AttackAllies");
++
++                    b.Property<Guid>("AttackAnimationId")
++                        .HasColumnName("AttackAnimation");
++
++                    b.Property<string>("AttackOnSightConditionsJson")
++                        .HasColumnName("AttackOnSightConditions");
++
++                    b.Property<int>("AttackSpeedModifier");
++
++                    b.Property<int>("AttackSpeedValue");
++
++                    b.Property<string>("CraftsJson")
++                        .HasColumnName("Spells");
++
++                    b.Property<int>("CritChance");
++
++                    b.Property<double>("CritMultiplier");
++
++                    b.Property<int>("Damage");
++
++                    b.Property<int>("DamageType");
++
++                    b.Property<long>("Experience");
++
++                    b.Property<byte>("FleeHealthPercentage");
++
++                    b.Property<bool>("FocusHighestDamageDealer");
++
++                    b.Property<string>("Folder");
++
++                    b.Property<string>("JsonAggroList")
++                        .HasColumnName("AggroList");
++
++                    b.Property<string>("JsonDrops")
++                        .HasColumnName("Drops");
++
++                    b.Property<string>("JsonMaxVital")
++                        .HasColumnName("MaxVital");
++
++                    b.Property<string>("JsonStat")
++                        .HasColumnName("Stats");
++
++                    b.Property<int>("Level");
++
++                    b.Property<int>("MoveRange");
++
++                    b.Property<byte>("Movement");
++
++                    b.Property<string>("Name");
++
++                    b.Property<bool>("NpcVsNpcEnabled");
++
++                    b.Property<Guid>("OnDeathEventId")
++                        .HasColumnName("OnDeathEvent");
++
++                    b.Property<Guid>("OnDeathPartyEventId")
++                        .HasColumnName("OnDeathPartyEvent");
++
++                    b.Property<string>("PlayerCanAttackConditionsJson")
++                        .HasColumnName("PlayerCanAttackConditions");
++
++                    b.Property<string>("PlayerFriendConditionsJson")
++                        .HasColumnName("PlayerFriendConditions");
++
++                    b.Property<string>("RegenJson")
++                        .HasColumnName("VitalRegen");
++
++                    b.Property<int>("Scaling");
++
++                    b.Property<int>("ScalingStat");
++
++                    b.Property<int>("SightRange");
++
++                    b.Property<int>("SpawnDuration");
++
++                    b.Property<int>("SpellFrequency");
++
++                    b.Property<string>("Sprite");
++
++                    b.Property<bool>("Swarm");
++
++                    b.Property<long>("TimeCreated");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("Npcs");
++                });
++
++            modelBuilder.Entity("Intersect.GameObjects.PlayerVariableBase", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd();
++
++                    b.Property<string>("Folder");
++
++                    b.Property<string>("Name");
++
++                    b.Property<string>("TextId");
++
++                    b.Property<long>("TimeCreated");
++
++                    b.Property<byte>("Type");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("PlayerVariables");
++                });
++
++            modelBuilder.Entity("Intersect.GameObjects.ProjectileBase", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd();
++
++                    b.Property<Guid>("AmmoItemId")
++                        .HasColumnName("Ammo");
++
++                    b.Property<int>("AmmoRequired");
++
++                    b.Property<string>("AnimationsJson")
++                        .HasColumnName("Animations");
++
++                    b.Property<int>("Delay");
++
++                    b.Property<string>("Folder");
++
++                    b.Property<bool>("GrappleHook");
++
++                    b.Property<bool>("IgnoreActiveResources");
++
++                    b.Property<bool>("IgnoreExhaustedResources");
++
++                    b.Property<bool>("IgnoreMapBlocks");
++
++                    b.Property<bool>("IgnoreZDimension");
++
++                    b.Property<int>("Knockback");
++
++                    b.Property<string>("Name");
++
++                    b.Property<bool>("PierceTarget");
++
++                    b.Property<int>("Quantity");
++
++                    b.Property<int>("Range");
++
++                    b.Property<string>("SpawnsJson")
++                        .HasColumnName("SpawnLocations");
++
++                    b.Property<int>("Speed");
++
++                    b.Property<Guid>("SpellId")
++                        .HasColumnName("Spell");
++
++                    b.Property<long>("TimeCreated");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("Projectiles");
++                });
++
++            modelBuilder.Entity("Intersect.GameObjects.QuestBase", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd();
++
++                    b.Property<string>("BeforeDescription");
++
++                    b.Property<string>("EndDescription");
++
++                    b.Property<Guid>("EndEventId")
++                        .HasColumnName("EndEvent");
++
++                    b.Property<string>("Folder");
++
++                    b.Property<string>("InProgressDescription");
++
++                    b.Property<string>("JsonRequirements")
++                        .HasColumnName("Requirements");
++
++                    b.Property<bool>("LogAfterComplete");
++
++                    b.Property<bool>("LogBeforeOffer");
++
++                    b.Property<string>("Name");
++
++                    b.Property<bool>("Quitable");
++
++                    b.Property<bool>("Repeatable");
++
++                    b.Property<string>("StartDescription");
++
++                    b.Property<Guid>("StartEventId")
++                        .HasColumnName("StartEvent");
++
++                    b.Property<string>("TasksJson")
++                        .HasColumnName("Tasks");
++
++                    b.Property<long>("TimeCreated");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("Quests");
++                });
++
++            modelBuilder.Entity("Intersect.GameObjects.ResourceBase", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd();
++
++                    b.Property<Guid>("AnimationId")
++                        .HasColumnName("Animation");
++
++                    b.Property<Guid>("EventId")
++                        .HasColumnName("Event");
++
++                    b.Property<string>("Folder");
++
++                    b.Property<string>("JsonDrops")
++                        .HasColumnName("Drops");
++
++                    b.Property<string>("JsonHarvestingRequirements")
++                        .HasColumnName("HarvestingRequirements");
++
++                    b.Property<int>("MaxHp");
++
++                    b.Property<int>("MinHp");
++
++                    b.Property<string>("Name");
++
++                    b.Property<int>("SpawnDuration");
++
++                    b.Property<long>("TimeCreated");
++
++                    b.Property<int>("Tool");
++
++                    b.Property<int>("VitalRegen");
++
++                    b.Property<bool>("WalkableAfter");
++
++                    b.Property<bool>("WalkableBefore");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("Resources");
++                });
++
++            modelBuilder.Entity("Intersect.GameObjects.ServerVariableBase", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd();
++
++                    b.Property<string>("Folder");
++
++                    b.Property<string>("Json")
++                        .HasColumnName("Value");
++
++                    b.Property<string>("Name");
++
++                    b.Property<string>("TextId");
++
++                    b.Property<long>("TimeCreated");
++
++                    b.Property<byte>("Type");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("ServerVariables");
++                });
++
++            modelBuilder.Entity("Intersect.GameObjects.ShopBase", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd();
++
++                    b.Property<bool>("BuyingWhitelist");
++
++                    b.Property<Guid>("DefaultCurrencyId")
++                        .HasColumnName("DefaultCurrency");
++
++                    b.Property<string>("Folder");
++
++                    b.Property<string>("JsonBuyingItems")
++                        .HasColumnName("BuyingItems");
++
++                    b.Property<string>("JsonSellingItems")
++                        .HasColumnName("SellingItems");
++
++                    b.Property<string>("Name");
++
++                    b.Property<long>("TimeCreated");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("Shops");
++                });
++
++            modelBuilder.Entity("Intersect.GameObjects.SpellBase", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd();
++
++                    b.Property<bool>("Bound");
++
++                    b.Property<Guid>("CastAnimationId")
++                        .HasColumnName("CastAnimation");
++
++                    b.Property<int>("CastDuration");
++
++                    b.Property<int>("CooldownDuration");
++
++                    b.Property<string>("Description");
++
++                    b.Property<Guid>("EventId")
++                        .HasColumnName("Event");
++
++                    b.Property<string>("Folder");
++
++                    b.Property<Guid>("HitAnimationId")
++                        .HasColumnName("HitAnimation");
++
++                    b.Property<string>("Icon");
++
++                    b.Property<string>("JsonCastRequirements")
++                        .HasColumnName("CastRequirements");
++
++                    b.Property<string>("Name");
++
++                    b.Property<int>("SpellType");
++
++                    b.Property<long>("TimeCreated");
++
++                    b.Property<string>("VitalCostJson")
++                        .HasColumnName("VitalCost");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("Spells");
++                });
++
++            modelBuilder.Entity("Intersect.GameObjects.TilesetBase", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd();
++
++                    b.Property<string>("Name");
++
++                    b.Property<long>("TimeCreated");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("Tilesets");
++                });
++
++            modelBuilder.Entity("Intersect.GameObjects.TimeBase", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd();
++
++                    b.Property<string>("DaylightHuesJson")
++                        .HasColumnName("DaylightHues");
++
++                    b.Property<int>("RangeInterval");
++
++                    b.Property<float>("Rate");
++
++                    b.Property<bool>("SyncTime");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("Time");
++                });
++
++            modelBuilder.Entity("Intersect.Server.Maps.MapInstance", b =>
++                {
++                    b.Property<Guid>("Id")
++                        .ValueGeneratedOnAdd();
++
++                    b.Property<int>("AHue");
++
++                    b.Property<byte[]>("AttributeData")
++                        .HasColumnName("Attributes");
++
++                    b.Property<int>("BHue");
++
++                    b.Property<int>("Brightness");
++
++                    b.Property<Guid>("Down");
++
++                    b.Property<string>("EventIdsJson")
++                        .HasColumnName("Events");
++
++                    b.Property<string>("Fog");
++
++                    b.Property<int>("FogTransparency");
++
++                    b.Property<int>("FogXSpeed");
++
++                    b.Property<int>("FogYSpeed");
++
++                    b.Property<int>("GHue");
++
++                    b.Property<bool>("IsIndoors");
++
++                    b.Property<Guid>("Left");
++
++                    b.Property<string>("LightsJson")
++                        .HasColumnName("Lights");
++
++                    b.Property<string>("Music");
++
++                    b.Property<string>("Name");
++
++                    b.Property<string>("NpcSpawnsJson")
++                        .HasColumnName("NpcSpawns");
++
++                    b.Property<string>("OverlayGraphic");
++
++                    b.Property<string>("Panorama");
++
++                    b.Property<string>("PlayerLightColorJson")
++                        .HasColumnName("PlayerLightColor");
++
++                    b.Property<float>("PlayerLightExpand");
++
++                    b.Property<byte>("PlayerLightIntensity");
++
++                    b.Property<int>("PlayerLightSize");
++
++                    b.Property<int>("RHue");
++
++                    b.Property<int>("Revision");
++
++                    b.Property<Guid>("Right");
++
++                    b.Property<string>("Sound");
++
++                    b.Property<byte[]>("TileData");
++
++                    b.Property<long>("TimeCreated");
++
++                    b.Property<Guid>("Up");
++
++                    b.Property<Guid>("WeatherAnimationId")
++                        .HasColumnName("WeatherAnimation");
++
++                    b.Property<int>("WeatherIntensity");
++
++                    b.Property<int>("WeatherXSpeed");
++
++                    b.Property<int>("WeatherYSpeed");
++
++                    b.Property<int>("ZoneType");
++
++                    b.HasKey("Id");
++
++                    b.ToTable("Maps");
++                });
++
++            modelBuilder.Entity("Intersect.GameObjects.AnimationBase", b =>
++                {
++                    b.OwnsOne("Intersect.GameObjects.AnimationLayer", "Lower", b1 =>
++                        {
++                            b1.Property<Guid>("AnimationBaseId");
++
++                            b1.Property<bool>("AlternateRenderLayer");
++
++                            b1.Property<bool>("DisableRotations");
++
++                            b1.Property<int>("FrameCount");
++
++                            b1.Property<int>("FrameSpeed");
++
++                            b1.Property<string>("Light");
++
++                            b1.Property<int>("LoopCount");
++
++                            b1.Property<string>("Sprite");
++
++                            b1.Property<int>("XFrames");
++
++                            b1.Property<int>("YFrames");
++
++                            b1.ToTable("Animations");
++
++                            b1.HasOne("Intersect.GameObjects.AnimationBase")
++                                .WithOne("Lower")
++                                .HasForeignKey("Intersect.GameObjects.AnimationLayer", "AnimationBaseId")
++                                .OnDelete(DeleteBehavior.Cascade);
++                        });
++
++                    b.OwnsOne("Intersect.GameObjects.AnimationLayer", "Upper", b1 =>
++                        {
++                            b1.Property<Guid>("AnimationBaseId");
++
++                            b1.Property<bool>("AlternateRenderLayer");
++
++                            b1.Property<bool>("DisableRotations");
++
++                            b1.Property<int>("FrameCount");
++
++                            b1.Property<int>("FrameSpeed");
++
++                            b1.Property<string>("Light");
++
++                            b1.Property<int>("LoopCount");
++
++                            b1.Property<string>("Sprite");
++
++                            b1.Property<int>("XFrames");
++
++                            b1.Property<int>("YFrames");
++
++                            b1.ToTable("Animations");
++
++                            b1.HasOne("Intersect.GameObjects.AnimationBase")
++                                .WithOne("Upper")
++                                .HasForeignKey("Intersect.GameObjects.AnimationLayer", "AnimationBaseId")
++                                .OnDelete(DeleteBehavior.Cascade);
++                        });
++                });
++
++            modelBuilder.Entity("Intersect.GameObjects.ItemBase", b =>
++                {
++                    b.OwnsOne("Intersect.GameObjects.ConsumableData", "Consumable", b1 =>
++                        {
++                            b1.Property<Guid>("ItemBaseId");
++
++                            b1.Property<int>("Percentage");
++
++                            b1.Property<byte>("Type");
++
++                            b1.Property<int>("Value");
++
++                            b1.ToTable("Items");
++
++                            b1.HasOne("Intersect.GameObjects.ItemBase")
++                                .WithOne("Consumable")
++                                .HasForeignKey("Intersect.GameObjects.ConsumableData", "ItemBaseId")
++                                .OnDelete(DeleteBehavior.Cascade);
++                        });
++
++                    b.OwnsOne("Intersect.GameObjects.EffectData", "Effect", b1 =>
++                        {
++                            b1.Property<Guid>("ItemBaseId");
++
++                            b1.Property<int>("Percentage");
++
++                            b1.Property<byte>("Type");
++
++                            b1.ToTable("Items");
++
++                            b1.HasOne("Intersect.GameObjects.ItemBase")
++                                .WithOne("Effect")
++                                .HasForeignKey("Intersect.GameObjects.EffectData", "ItemBaseId")
++                                .OnDelete(DeleteBehavior.Cascade);
++                        });
++                });
++
++            modelBuilder.Entity("Intersect.GameObjects.ResourceBase", b =>
++                {
++                    b.OwnsOne("Intersect.GameObjects.ResourceState", "Exhausted", b1 =>
++                        {
++                            b1.Property<Guid>("ResourceBaseId");
++
++                            b1.Property<string>("Graphic");
++
++                            b1.Property<bool>("GraphicFromTileset");
++
++                            b1.Property<int>("Height");
++
++                            b1.Property<bool>("RenderBelowEntities");
++
++                            b1.Property<int>("Width");
++
++                            b1.Property<int>("X");
++
++                            b1.Property<int>("Y");
++
++                            b1.ToTable("Resources");
++
++                            b1.HasOne("Intersect.GameObjects.ResourceBase")
++                                .WithOne("Exhausted")
++                                .HasForeignKey("Intersect.GameObjects.ResourceState", "ResourceBaseId")
++                                .OnDelete(DeleteBehavior.Cascade);
++                        });
++
++                    b.OwnsOne("Intersect.GameObjects.ResourceState", "Initial", b1 =>
++                        {
++                            b1.Property<Guid>("ResourceBaseId");
++
++                            b1.Property<string>("Graphic");
++
++                            b1.Property<bool>("GraphicFromTileset");
++
++                            b1.Property<int>("Height");
++
++                            b1.Property<bool>("RenderBelowEntities");
++
++                            b1.Property<int>("Width");
++
++                            b1.Property<int>("X");
++
++                            b1.Property<int>("Y");
++
++                            b1.ToTable("Resources");
++
++                            b1.HasOne("Intersect.GameObjects.ResourceBase")
++                                .WithOne("Initial")
++                                .HasForeignKey("Intersect.GameObjects.ResourceState", "ResourceBaseId")
++                                .OnDelete(DeleteBehavior.Cascade);
++                        });
++                });
++
++            modelBuilder.Entity("Intersect.GameObjects.SpellBase", b =>
++                {
++                    b.OwnsOne("Intersect.GameObjects.SpellCombatData", "Combat", b1 =>
++                        {
++                            b1.Property<Guid>("SpellBaseId");
++
++                            b1.Property<int>("CastRange");
++
++                            b1.Property<int>("CritChance");
++
++                            b1.Property<double>("CritMultiplier");
++
++                            b1.Property<int>("DamageType");
++
++                            b1.Property<int>("Duration");
++
++                            b1.Property<int>("Effect");
++
++                            b1.Property<bool>("Friendly");
++
++                            b1.Property<int>("HitRadius");
++
++                            b1.Property<bool>("HoTDoT");
++
++                            b1.Property<int>("HotDotInterval");
++
++                            b1.Property<int>("OnHitDuration")
++                                .HasColumnName("OnHit");
++
++                            b1.Property<string>("PercentageStatDiffJson")
++                                .HasColumnName("PercentageStatDiff");
++
++                            b1.Property<Guid>("ProjectileId")
++                                .HasColumnName("Projectile");
++
++                            b1.Property<int>("Scaling");
++
++                            b1.Property<int>("ScalingStat");
++
++                            b1.Property<string>("StatDiffJson")
++                                .HasColumnName("StatDiff");
++
++                            b1.Property<int>("TargetType");
++
++                            b1.Property<string>("TransformSprite");
++
++                            b1.Property<int>("TrapDuration")
++                                .HasColumnName("Trap");
++
++                            b1.Property<string>("VitalDiffJson")
++                                .HasColumnName("VitalDiff");
++
++                            b1.ToTable("Spells");
++
++                            b1.HasOne("Intersect.GameObjects.SpellBase")
++                                .WithOne("Combat")
++                                .HasForeignKey("Intersect.GameObjects.SpellCombatData", "SpellBaseId")
++                                .OnDelete(DeleteBehavior.Cascade);
++                        });
++
++                    b.OwnsOne("Intersect.GameObjects.SpellDashOpts", "Dash", b1 =>
++                        {
++                            b1.Property<Guid>("SpellBaseId");
++
++                            b1.Property<bool>("IgnoreActiveResources");
++
++                            b1.Property<bool>("IgnoreInactiveResources");
++
++                            b1.Property<bool>("IgnoreMapBlocks");
++
++                            b1.Property<bool>("IgnoreZDimensionAttributes");
++
++                            b1.ToTable("Spells");
++
++                            b1.HasOne("Intersect.GameObjects.SpellBase")
++                                .WithOne("Dash")
++                                .HasForeignKey("Intersect.GameObjects.SpellDashOpts", "SpellBaseId")
++                                .OnDelete(DeleteBehavior.Cascade);
++                        });
++
++                    b.OwnsOne("Intersect.GameObjects.SpellWarpData", "Warp", b1 =>
++                        {
++                            b1.Property<Guid>("SpellBaseId");
++
++                            b1.Property<int>("Dir");
++
++                            b1.Property<Guid>("MapId");
++
++                            b1.Property<int>("X");
++
++                            b1.Property<int>("Y");
++
++                            b1.ToTable("Spells");
++
++                            b1.HasOne("Intersect.GameObjects.SpellBase")
++                                .WithOne("Warp")
++                                .HasForeignKey("Intersect.GameObjects.SpellWarpData", "SpellBaseId")
++                                .OnDelete(DeleteBehavior.Cascade);
++                        });
++                });
++#pragma warning restore 612, 618
++        }
++    }
++}
+diff --git a/Intersect.Server/Migrations/Game/20200414015804_AddingMoveRange.cs b/Intersect.Server/Migrations/Game/20200414015804_AddingMoveRange.cs
+new file mode 100644
+index 00000000..2e502697
+--- /dev/null
++++ b/Intersect.Server/Migrations/Game/20200414015804_AddingMoveRange.cs
+@@ -0,0 +1,23 @@
++﻿using Microsoft.EntityFrameworkCore.Migrations;
++
++namespace Intersect.Server.Migrations.Game
++{
++    public partial class AddingMoveRange : Migration
++    {
++        protected override void Up(MigrationBuilder migrationBuilder)
++        {
++            migrationBuilder.AddColumn<int>(
++                name: "MoveRange",
++                table: "Npcs",
++                nullable: false,
++                defaultValue: 0);
++        }
++
++        protected override void Down(MigrationBuilder migrationBuilder)
++        {
++            migrationBuilder.DropColumn(
++                name: "MoveRange",
++                table: "Npcs");
++        }
++    }
++}
+diff --git a/Intersect.Server/Migrations/Game/GameContextModelSnapshot.cs b/Intersect.Server/Migrations/Game/GameContextModelSnapshot.cs
+index fbfd65a8..4676a415 100644
+--- a/Intersect.Server/Migrations/Game/GameContextModelSnapshot.cs
++++ b/Intersect.Server/Migrations/Game/GameContextModelSnapshot.cs
+@@ -361,6 +361,8 @@ protected override void BuildModel(ModelBuilder modelBuilder)
+ 
+                     b.Property<int>("Level");
+ 
++                    b.Property<int>("MoveRange");
++
+                     b.Property<byte>("Movement");
+ 
+                     b.Property<string>("Name");
+-- 
+2.26.0.windows.1
+
