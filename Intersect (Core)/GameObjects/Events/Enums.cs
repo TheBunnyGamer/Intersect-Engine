@@ -230,6 +230,9 @@
         //Remove Hotbar Spells
         RemoveHotbarSpell,
 
+        //Change Stat
+        ChangeStat,
+
     }
 
 }

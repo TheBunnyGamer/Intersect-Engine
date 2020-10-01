@@ -495,6 +495,16 @@ namespace Intersect.GameObjects.Events.Commands
 
     }
 
+    public class ChangeStatCommand : EventCommand
+    {
+
+        public override EventCommandType Type { get; } = EventCommandType.ChangeStat;
+
+        public int StatName { get; set; }
+        public decimal AddValue { get; set; }
+
+    }
+
     public class ChangeSpriteCommand : EventCommand
     {
 

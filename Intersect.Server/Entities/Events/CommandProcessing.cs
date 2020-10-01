@@ -505,6 +505,18 @@ namespace Intersect.Server.Entities.Events
             PacketSender.SendRemoveHotBarSpell(player, command.SpellId);
         }
 
+        //Change Stat Command
+        private static void ProcessCommand(
+            ChangeStatCommand command,
+            Player player,
+            Event instance,
+            CommandInstance stackInfo,
+            Stack<CommandInstance> callStack
+        )
+        {
+            player.ChangeStat(command.StatName, command.AddValue);
+        }
+
         //Change Sprite Command
         private static void ProcessCommand(
             ChangeSpriteCommand command,

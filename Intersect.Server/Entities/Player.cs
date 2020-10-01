@@ -4470,6 +4470,12 @@ namespace Intersect.Server.Entities
             Hotbar[swapIndex].PreferredStatBuffs = stats;
         }
 
+        //ChangeStat
+        public void ChangeStat(int StatName, decimal AddValue)
+        {
+            Stat[StatName].BaseStat = Stat[StatName].BaseStat + (int)AddValue;
+        }
+
         //Quests
         public bool CanStartQuest(QuestBase quest)
         {
