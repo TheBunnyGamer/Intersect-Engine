@@ -666,9 +666,9 @@ namespace Intersect.Server.Entities.Events
                         playermapidvariabletest = player.Variables[i].Value;
                         for (var i2 = 0; i2 < GameObjects.Maps.MapList.MapList.OrderedMaps.Count; i2++)
                         {
-                            if (GameObjects.Maps.MapList.MapList.OrderedMaps[i2].Name == playermapidvariabletest)
+                            if (GameObjects.Maps.MapList.MapList.OrderedMaps[i].Name == playermapidvariabletest)
                             {
-                                playermapidvariable = GameObjects.Maps.MapList.MapList.OrderedMaps[i2].MapId;
+                                playermapidvariable = GameObjects.Maps.MapList.MapList.OrderedMaps[i].MapId;
                                 breakthisloop = true;
                                 break;
                             }
@@ -694,13 +694,10 @@ namespace Intersect.Server.Entities.Events
                     }
                 }
 
-                if (playermapidvariable != Guid.NewGuid())
-                {
-                    player.Warp(
-                         playermapidvariable, playerxidvariable, playeryidvariable,
-                        command.Direction == WarpDirection.Retain ? (byte)player.Dir : (byte)(command.Direction - 1)
-                    );
-                }
+                player.Warp(
+                     playermapidvariable, playerxidvariable, playeryidvariable,
+                    command.Direction == WarpDirection.Retain ? (byte)player.Dir : (byte)(command.Direction - 1)
+                );
             }
         }
 
