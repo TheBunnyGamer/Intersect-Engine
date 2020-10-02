@@ -233,6 +233,9 @@
         //Change Stat
         ChangeStat,
 
+        //Use Spell
+        UseSpell,
+
     }
 
 }

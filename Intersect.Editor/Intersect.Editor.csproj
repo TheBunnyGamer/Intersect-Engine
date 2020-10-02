@@ -92,6 +92,12 @@
     <Compile Include="Forms\Editors\Events\Event Commands\EventCommand_ChangeStat.Designer.cs">
       <DependentUpon>EventCommand_ChangeStat.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\Editors\Events\Event Commands\EventCommand_UseSpell.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Editors\Events\Event Commands\EventCommand_UseSpell.Designer.cs">
+      <DependentUpon>EventCommand_UseSpell.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\Editors\Events\Event Commands\EventCommand_RemoveHotbarSpell.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -686,6 +692,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Editors\Events\Event Commands\EventCommand_ChangeStat.resx">
       <DependentUpon>EventCommand_ChangeStat.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Editors\Events\Event Commands\EventCommand_UseSpell.resx">
+      <DependentUpon>EventCommand_UseSpell.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Editors\Events\Event Commands\EventCommand_RemoveHotbarSpell.resx">
       <DependentUpon>EventCommand_RemoveHotbarSpell.cs</DependentUpon>

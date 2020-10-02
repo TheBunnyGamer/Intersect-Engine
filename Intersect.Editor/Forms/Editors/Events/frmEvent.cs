@@ -603,6 +603,10 @@ namespace Intersect.Editor.Forms.Editors.Events
                     tmpCommand = new ChangeStatCommand();
 
                     break;
+                case EventCommandType.UseSpell:
+                    tmpCommand = new UseSpellCommand();
+
+                    break;
                 case EventCommandType.ChangeSprite:
                     tmpCommand = new ChangeSpriteCommand();
 
@@ -1188,7 +1192,11 @@ namespace Intersect.Editor.Forms.Editors.Events
 
                     break;
                 case EventCommandType.ChangeStat:
-                    cmdWindow = new EventCommandChangeStat((ChangeStatCommand)command, this);
+                    cmdWindow = new EventCommandChangeStat((ChangeStatCommand) command, this);
+
+                    break;
+                case EventCommandType.UseSpell:
+                    cmdWindow = new EventCommandUseSpell((UseSpellCommand) command, this);
 
                     break;
                 case EventCommandType.ChangeSprite:

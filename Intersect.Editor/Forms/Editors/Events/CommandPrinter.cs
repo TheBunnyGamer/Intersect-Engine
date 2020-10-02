@@ -647,6 +647,11 @@ namespace Intersect.Editor.Forms.Editors.Events
             }
         }
 
+        private static string GetCommandText(UseSpellCommand command, MapInstance map)
+        {
+            return Strings.EventCommandList.usespell.ToString(SpellBase.GetName(command.SpellId));
+        }
+
         private static string GetCommandText(ChangeSpriteCommand command, MapInstance map)
         {
             return Strings.EventCommandList.setsprite.ToString(command.Sprite);

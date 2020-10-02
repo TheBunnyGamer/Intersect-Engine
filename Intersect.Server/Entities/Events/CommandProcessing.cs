@@ -517,6 +517,18 @@ namespace Intersect.Server.Entities.Events
             player.ChangeStat(command.StatName, command.AddValue, command.UsingVariable, command.VariableId);
         }
 
+        //Use Spell Command
+        private static void ProcessCommand(
+            UseSpellCommand command,
+            Player player,
+            Event instance,
+            CommandInstance stackInfo,
+            Stack<CommandInstance> callStack
+        )
+        {
+            player.CastSpell(command.SpellId);
+        }
+
         //Change Sprite Command
         private static void ProcessCommand(
             ChangeSpriteCommand command,
