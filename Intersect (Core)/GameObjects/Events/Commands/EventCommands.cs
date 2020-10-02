@@ -502,6 +502,8 @@ namespace Intersect.GameObjects.Events.Commands
 
         public int StatName { get; set; }
         public decimal AddValue { get; set; }
+        public bool UsingVariable { get; set; }
+        public Guid VariableId { get; set; }
 
     }
 

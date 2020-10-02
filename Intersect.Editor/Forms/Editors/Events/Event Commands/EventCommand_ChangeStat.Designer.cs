@@ -38,6 +38,8 @@ namespace Intersect.Editor.Forms.Editors.Events.Event_Commands
             this.lblItem = new System.Windows.Forms.Label();
             this.btnCancel = new DarkUI.Controls.DarkButton();
             this.btnSave = new DarkUI.Controls.DarkButton();
+            this.cmbVariable = new DarkUI.Controls.DarkComboBox();
+            this.chkUseVariable = new DarkUI.Controls.DarkCheckBox();
             this.grpChangeStat.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudStat)).BeginInit();
             this.SuspendLayout();
@@ -46,6 +48,8 @@ namespace Intersect.Editor.Forms.Editors.Events.Event_Commands
             // 
             this.grpChangeStat.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(63)))), ((int)(((byte)(65)))));
             this.grpChangeStat.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
+            this.grpChangeStat.Controls.Add(this.chkUseVariable);
+            this.grpChangeStat.Controls.Add(this.cmbVariable);
             this.grpChangeStat.Controls.Add(this.label1);
             this.grpChangeStat.Controls.Add(this.nudStat);
             this.grpChangeStat.Controls.Add(this.cmbItem);
@@ -145,6 +149,38 @@ namespace Intersect.Editor.Forms.Editors.Events.Event_Commands
             this.btnSave.Text = "Ok";
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
+            // cmbVariable
+            // 
+            this.cmbVariable.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(69)))), ((int)(((byte)(73)))), ((int)(((byte)(74)))));
+            this.cmbVariable.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(90)))), ((int)(((byte)(90)))), ((int)(((byte)(90)))));
+            this.cmbVariable.BorderStyle = System.Windows.Forms.ButtonBorderStyle.Solid;
+            this.cmbVariable.ButtonColor = System.Drawing.Color.FromArgb(((int)(((byte)(43)))), ((int)(((byte)(43)))), ((int)(((byte)(43)))));
+            this.cmbVariable.ButtonIcon = ((System.Drawing.Bitmap)(resources.GetObject("cmbVariable.ButtonIcon")));
+            this.cmbVariable.DrawDropdownHoverOutline = false;
+            this.cmbVariable.DrawFocusRectangle = false;
+            this.cmbVariable.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.cmbVariable.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbVariable.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cmbVariable.ForeColor = System.Drawing.Color.Gainsboro;
+            this.cmbVariable.FormattingEnabled = true;
+            this.cmbVariable.Location = new System.Drawing.Point(76, 77);
+            this.cmbVariable.Name = "cmbVariable";
+            this.cmbVariable.Size = new System.Drawing.Size(104, 21);
+            this.cmbVariable.TabIndex = 23;
+            this.cmbVariable.Text = null;
+            this.cmbVariable.TextPadding = new System.Windows.Forms.Padding(2);
+            // 
+            // chkUseVariable
+            // 
+            this.chkUseVariable.AutoSize = true;
+            this.chkUseVariable.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(63)))), ((int)(((byte)(65)))));
+            this.chkUseVariable.Location = new System.Drawing.Point(6, 79);
+            this.chkUseVariable.Name = "chkUseVariable";
+            this.chkUseVariable.Size = new System.Drawing.Size(64, 17);
+            this.chkUseVariable.TabIndex = 41;
+            this.chkUseVariable.Text = "Variable";
+            this.btnCancel.Click += new System.EventHandler(this.btnUseVariable);
+            // 
             // EventCommandChangeStat
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -170,5 +206,7 @@ namespace Intersect.Editor.Forms.Editors.Events.Event_Commands
         private System.Windows.Forms.Label lblItem;
         private System.Windows.Forms.Label label1;
         private DarkNumericUpDown nudStat;
+        internal DarkComboBox cmbVariable;
+        private DarkCheckBox chkUseVariable;
     }
 }

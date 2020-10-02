@@ -28,6 +28,10 @@ namespace Intersect.Editor.Forms.Editors.Events.Event_Commands
             {
                 cmbItem.Items.Add(Strings.Combat.stats[i]);
             }
+            for (var i = 0; i < (int)PlayerVariableBase.Names.Length; i++)
+            {
+                cmbVariable.Items.Add(PlayerVariableBase.Names[i]);
+            }
 
             /*for (int i = 0; i < Strings.Combat.stats.Count - 1; i++)
             {
@@ -38,6 +42,8 @@ namespace Intersect.Editor.Forms.Editors.Events.Event_Commands
             }*/
             cmbItem.SelectedIndex = mMyCommand.StatName;
             nudStat.Value = mMyCommand.AddValue;
+            chkUseVariable.Checked = mMyCommand.UsingVariable;
+            cmbVariable.SelectedIndex = PlayerVariableBase.ListIndex(mMyCommand.VariableId);
         }
 
         private void InitLocalization()
@@ -51,6 +57,16 @@ namespace Intersect.Editor.Forms.Editors.Events.Event_Commands
         {
             mMyCommand.StatName = cmbItem.SelectedIndex;
             mMyCommand.AddValue = nudStat.Value;
+            if (chkUseVariable.Checked == true)
+            {
+                mMyCommand.UsingVariable = true;
+                mMyCommand.VariableId = PlayerVariableBase.IdFromList(cmbVariable.SelectedIndex);
+            }
+            else
+            {
+                mMyCommand.UsingVariable = false;
+                mMyCommand.VariableId = Guid.NewGuid();
+            }
             mEventEditor.FinishCommandEdit();
         }
 
@@ -67,6 +83,11 @@ namespace Intersect.Editor.Forms.Editors.Events.Event_Commands
         private void grpChangeStat_Enter(object sender, EventArgs e)
         {
 
+        }
+
+        private void btnUseVariable(object sender, EventArgs e)
+        {
+            
         }
     }
 

@@ -514,7 +514,7 @@ namespace Intersect.Server.Entities.Events
             Stack<CommandInstance> callStack
         )
         {
-            player.ChangeStat(command.StatName, command.AddValue);
+            player.ChangeStat(command.StatName, command.AddValue, command.UsingVariable, command.VariableId);
         }
 
         //Change Sprite Command

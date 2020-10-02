@@ -4471,9 +4471,25 @@ namespace Intersect.Server.Entities
         }
 
         //ChangeStat
-        public void ChangeStat(int StatName, decimal AddValue)
+        public void ChangeStat(int StatName, decimal AddValue, bool UsingVariable, Guid VariableId)
         {
-            Stat[StatName].BaseStat = Stat[StatName].BaseStat + (int)AddValue;
+            if (UsingVariable == true)
+            {
+                int varvalue = 0;
+                for (var i = 0; i < (int)Variables.Count; i++)
+                {
+                    if (Variables[i].VariableId == VariableId)
+                    {
+                        varvalue = (int)Variables[i].Value.Integer;
+                        break;
+                    }
+                }
+                Stat[StatName].BaseStat = Stat[StatName].BaseStat + varvalue;
+            }
+            else
+            {
+                Stat[StatName].BaseStat = Stat[StatName].BaseStat + (int)AddValue;
+            }
         }
 
         //Quests

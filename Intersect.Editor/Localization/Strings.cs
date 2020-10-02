@@ -1460,6 +1460,8 @@ Tick timer saved in server config.json.";
 
             public static LocalizedString changestat = @"Change Stat: [{00} + {01}]";
 
+            public static LocalizedString changestatvar = @"Change Stat: [{00} + {01}]";
+
             public static LocalizedString changespells = @"Change Player Spells [{00}]";
 
             public static LocalizedString chatboxtext = @"Show Chatbox Text [Channel: {00}, Color: {01}] - {02}";

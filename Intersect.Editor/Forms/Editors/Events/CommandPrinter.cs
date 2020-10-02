@@ -637,7 +637,14 @@ namespace Intersect.Editor.Forms.Editors.Events
 
         private static string GetCommandText(ChangeStatCommand command, MapInstance map)
         {
-            return Strings.EventCommandList.changestat.ToString(Strings.Combat.stats[command.StatName], command.AddValue);
+            if (command.UsingVariable == true)
+            {
+                return Strings.EventCommandList.changestatvar.ToString(Strings.Combat.stats[command.StatName], PlayerVariableBase.Get(command.VariableId).Name);
+            }
+            else
+            {
+                return Strings.EventCommandList.changestat.ToString(Strings.Combat.stats[command.StatName], command.AddValue);
+            }
         }
 
         private static string GetCommandText(ChangeSpriteCommand command, MapInstance map)
