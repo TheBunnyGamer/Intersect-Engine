@@ -560,27 +560,27 @@ namespace Intersect.Server.Entities
             switch (Base.SpellFrequency)
             {
                 case 0:
-                    CastFreq = Globals.Timing.TimeMs + 30000;
+                    CastFreq = Globals.Timing.TimeMs + 11000;
 
                     break;
 
                 case 1:
-                    CastFreq = Globals.Timing.TimeMs + 15000;
+                    CastFreq = Globals.Timing.TimeMs + 7000;
 
                     break;
 
                 case 2:
-                    CastFreq = Globals.Timing.TimeMs + 8000;
-
-                    break;
-
-                case 3:
                     CastFreq = Globals.Timing.TimeMs + 4000;
 
                     break;
 
-                case 4:
+                case 3:
                     CastFreq = Globals.Timing.TimeMs + 2000;
+
+                    break;
+
+                case 4:
+                    CastFreq = Globals.Timing.TimeMs + 1000;
 
                     break;
             }
