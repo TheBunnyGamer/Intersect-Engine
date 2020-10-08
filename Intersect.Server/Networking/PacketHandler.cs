@@ -415,7 +415,7 @@ namespace Intersect.Server.Networking
                 if (player.MoveTimer > Globals.Timing.TimeMs)
                 {
                     //TODO: Make this based moreso on the players current ping instead of a flat value that can be abused
-                    player.MoveTimer = Globals.Timing.TimeMs + (long) (player.GetMovementTime() * .1f);
+                    player.MoveTimer = Globals.Timing.TimeMs + (long) (player.GetMovementTime() * .05f);
                 }
             }
             else
