@@ -306,7 +306,7 @@ namespace Intersect.Server.Entities.Events
                 prams.Add(prm.Key, prm.Value);
             }
 
-            prams.Add("evtName", BaseEvent.Name);
+            prams.Add("evtName", CommandProcessing.ParseEventText(BaseEvent.Name, player, null));
 
             var map = MapInstance.Get(BaseEvent.MapId);
             if (map != null)

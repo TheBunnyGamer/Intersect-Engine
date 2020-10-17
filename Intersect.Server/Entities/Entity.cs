@@ -2732,7 +2732,7 @@ namespace Intersect.Server.Entities
 
             packet.EntityId = Id;
             packet.MapId = MapId;
-            packet.Name = Name;
+            packet.Name = CommandProcessing.ParseEventText(Name, forPlayer, null);
             packet.Sprite = Sprite;
             packet.Face = Face;
             packet.Level = Level;

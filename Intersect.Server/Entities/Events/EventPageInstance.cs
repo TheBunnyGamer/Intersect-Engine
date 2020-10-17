@@ -138,7 +138,7 @@ namespace Intersect.Server.Entities.Events
             MapId = mapId;
             X = globalClone.X;
             Y = globalClone.Y;
-            Name = myEvent.Name;
+            Name = CommandProcessing.ParseEventText(myEvent.Name, player, null);
             MovementType = globalClone.MovementType;
             MovementFreq = globalClone.MovementFreq;
             MovementSpeed = globalClone.MovementSpeed;

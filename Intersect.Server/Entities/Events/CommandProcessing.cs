@@ -1391,6 +1391,26 @@ namespace Intersect.Server.Entities.Events
             combocount = combocount + 1;
         }
 
+        public static string GenerateName(int len)
+        {
+            Random r = new Random();
+            string[] consonants = { "b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "l", "n", "p", "q", "r", "s", "sh", "zh", "t", "v", "w", "x" };
+            string[] vowels = { "a", "e", "i", "o", "u", "ae", "y" };
+            string Name = "";
+            Name += consonants[r.Next(consonants.Length)].ToUpper();
+            Name += vowels[r.Next(vowels.Length)];
+            int b = 2; //b tells how many times a new letter has been added. It's 2 right now because the first two letters are already in the name.
+            while (b < len)
+            {
+                Name += consonants[r.Next(consonants.Length)];
+                b++;
+                Name += vowels[r.Next(vowels.Length)];
+                b++;
+            }
+
+            return Name;
+        }
+
         public static string ParseEventText(string input, Player player, Event instance)
         {
             if (input == null)
@@ -1412,6 +1432,17 @@ namespace Intersect.Server.Entities.Events
                     input = input.Replace(Strings.Events.eventparams, instance.FormatParameters(player));
                 }
 
+                input = input.Replace(Strings.Events.randomname, GenerateName(new Random().Next(8)));
+                if (instance != null)
+                {
+                    if (instance.PageInstance != null)
+                    {
+                        input = input.Replace(Strings.Events.eventnamecommand, instance.PageInstance.Name);
+                        input = input.Replace(Strings.Events.commandparameter, instance.PageInstance.Param);
+                    }
+
+                    input = input.Replace(Strings.Events.eventparams, instance.FormatParameters(player));
+                }
 
                 input = input.Replace(Strings.Events.accountid, player.UserId.ToString());
                 if (instance != null)

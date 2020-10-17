@@ -644,6 +644,9 @@ namespace Intersect.Server.Localization
             public readonly LocalizedString combocountplayer = @"\combocountplayer";
 
             [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+            public readonly LocalizedString randomname = @"\randomname";
+
+            [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
             public readonly LocalizedString watchdogkill =
                 @"Event killed due to commands processed in a single frame surpassing Event Watchdog Threshhold.  (Map: {00}  Event: {01})";
 
