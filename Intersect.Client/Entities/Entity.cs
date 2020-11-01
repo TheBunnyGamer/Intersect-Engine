@@ -1828,6 +1828,18 @@ namespace Intersect.Client.Entities
                 }
                 LastActionTime = Globals.System.GetTimeMs();
             }
+            else if (CastTime < Globals.System.GetTimeMs() && Globals.System.GetTimeMs() - CastTime < 450)
+            {
+                var duration = 450;
+                var timeIn = duration - (450 - Globals.System.GetTimeMs());
+                SpriteFrame = 0;  //(int)Math.Floor((timeIn / (duration / 4f)));
+
+                if (AnimatedTextures[SpriteAnimations.Spell] != null)
+                {
+                    SpriteAnimation = SpriteAnimations.Spell;
+                }
+                LastActionTime = Globals.System.GetTimeMs();
+            }
 
             if (SpriteAnimation == SpriteAnimations.Normal)
             {
