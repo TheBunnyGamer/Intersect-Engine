@@ -1391,20 +1391,31 @@ namespace Intersect.Server.Entities.Events
             combocount = combocount + 1;
         }
 
+        public static readonly Random random = new Random();
+        public static int GenerateRandomNumber(int min, int max)
+        {
+            return random.Next(min, max); //min is inclusive, max is exclusive
+        }
+
+        public static string FirstLetterToUpper(string str)
+        {
+            return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(str.ToLower());
+        }
+
         public static string GenerateName(int len)
         {
-            Random r = new Random();
-            string[] consonants = { "b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "l", "n", "p", "q", "r", "s", "sh", "zh", "t", "v", "w", "x" };
+            string[] consonants = { "b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "l", "n", "p", "q", "qu", "r", "s", "sh", "zh", "t", "th", "v", "w", "x" };
             string[] vowels = { "a", "e", "i", "o", "u", "ae", "y" };
             string Name = "";
-            Name += consonants[r.Next(consonants.Length)].ToUpper();
-            Name += vowels[r.Next(vowels.Length)];
+
+            Name += FirstLetterToUpper(consonants[GenerateRandomNumber(0, consonants.Length)]);
+            Name += vowels[GenerateRandomNumber(0, vowels.Length)];
             int b = 2; //b tells how many times a new letter has been added. It's 2 right now because the first two letters are already in the name.
             while (b < len)
             {
-                Name += consonants[r.Next(consonants.Length)];
+                Name += consonants[GenerateRandomNumber(0, consonants.Length)];
                 b++;
-                Name += vowels[r.Next(vowels.Length)];
+                Name += vowels[GenerateRandomNumber(0, vowels.Length)];
                 b++;
             }
 
