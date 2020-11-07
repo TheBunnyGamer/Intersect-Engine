@@ -578,7 +578,7 @@ namespace Intersect.Server.Maps
             }
         }
 
-        public Entity SpawnNpc(byte tileX, byte tileY, byte dir, Guid npcId, bool despawnable = false)
+        public Entity SpawnNpc(byte tileX, byte tileY, byte dir, Guid npcId, bool despawnable = false, Player ogplayer = null)
         {
             var npcBase = NpcBase.Get(npcId);
             if (npcBase != null)
@@ -590,6 +590,9 @@ namespace Intersect.Server.Maps
                     Y = tileY,
                     Dir = dir
                 };
+                npc.Passable = (npc.Level > 1);
+
+                npc.Name = CommandProcessing.ParseEventText(npc.Name, ogplayer, null);
 
                 AddEntity(npc);
                 PacketSender.SendEntityDataToProximity(npc);

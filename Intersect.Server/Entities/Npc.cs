@@ -177,7 +177,20 @@ namespace Intersect.Server.Entities
                     //TODO Make sure that the npc can target the player
                     if (this != en)
                     {
-                        Target = en;
+                        string ownername = "";
+                        string thiseventname = this.Name;
+                        string tempnpcname = thiseventname;
+                        for (int i = 0; tempnpcname[i].ToString() != "]"; i++)
+                        {
+                            if (tempnpcname[i].ToString() != "[")
+                            {
+                                ownername += tempnpcname[i].ToString();
+                            }
+                        }
+                        if (ownername == "" || ownername == en.Name)
+                        {
+                            Target = en;
+                        }
                     }
                 }
                 else

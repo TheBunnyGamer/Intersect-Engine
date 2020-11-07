@@ -1806,9 +1806,12 @@ namespace Intersect.Client.Entities
                                     }
                                 }
 
-                                blockedBy = en.Value;
+                                if (en.Value.Passable == false)
+                                {
+                                    blockedBy = en.Value;
 
-                                return -6;
+                                    return -6;
+                                }
                             }
                         }
                     }

@@ -882,10 +882,11 @@ namespace Intersect.Server.Entities.Events
                 }
             }
 
+            Player ogplayer = player;
             var tile = new TileHelper(mapId, tileX, tileY);
             if (tile.TryFix())
             {
-                var npc = MapInstance.Get(mapId).SpawnNpc((byte) tileX, (byte) tileY, direction, npcId, true);
+                var npc = MapInstance.Get(mapId).SpawnNpc((byte) tileX, (byte) tileY, direction, npcId, true, ogplayer);
                 player.SpawnedNpcs.Add((Npc) npc);
             }
         }
