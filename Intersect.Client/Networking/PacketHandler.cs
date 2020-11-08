@@ -1737,6 +1737,19 @@ namespace Intersect.Client.Networking
             Fade.FadeOut();
         }
 
+        //ConvertChatCmdReturnPacket
+        private static void HandlePacket(ConvertChatCmdReturnPacket packet)
+        {
+            if (packet.OfferOrDesc == false)
+            {
+                QuestBase.Get(packet.questid).InProgressDescription = packet.newstring;
+            }
+            else
+            {
+                QuestBase.Get(packet.questid).StartDescription = packet.newstring;
+            }
+        }
+
     }
 
 }

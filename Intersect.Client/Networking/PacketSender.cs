@@ -373,6 +373,11 @@ namespace Intersect.Client.Networking
             Network.SendPacket(new BumpPacket(mapId, eventId));
         }
 
+        public static void SendConvertChatCommands(string str, Guid questid, bool OfferOrDesc)
+        {
+            Network.SendPacket(new ConvertChatCmdPacket(str, questid, OfferOrDesc));
+        }
+
     }
 
 }

@@ -2038,6 +2038,13 @@ namespace Intersect.Server.Networking
             PacketSender.SendPasswordResetResult(client, success);
         }
 
+        //ConvertChatCmdPacket
+        public void HandlePacket(Client client, Player player, ConvertChatCmdPacket packet)
+        {
+            string newstr = Entities.Events.CommandProcessing.ParseEventText(packet.Str, player, null);
+            PacketSender.SendConvertChatCmdReturnPacket(player, newstr, packet.QuestId, packet.OfferOrDesc);
+        }
+
         #endregion
 
         #region "Editor Packets"

@@ -1901,6 +1901,11 @@ namespace Intersect.Server.Networking
             }
         }
 
+        public static void SendConvertChatCmdReturnPacket(Player player, String newstr, Guid QuestId, bool OfferOrDesc)
+        {
+            player.SendPacket(new ConvertChatCmdReturnPacket(newstr, QuestId, OfferOrDesc));
+        }
+
     }
 
 }

@@ -90,6 +90,8 @@ namespace Intersect.Client.Interface.Game
                 mQuestTitle.Text = quest.Name;
                 if (mQuestOfferText != quest.StartDescription)
                 {
+                    PacketSender.SendConvertChatCommands(quest.StartDescription, quest.Id, true);
+
                     mQuestPromptLabel.ClearText();
                     mQuestPromptLabel.Width = mQuestPromptArea.Width - mQuestPromptArea.GetVerticalScrollBar().Width;
                     mQuestPromptLabel.AddText(

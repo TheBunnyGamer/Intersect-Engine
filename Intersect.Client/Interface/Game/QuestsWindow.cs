@@ -249,6 +249,8 @@ namespace Intersect.Client.Interface.Game
                         mQuestStatus.SetTextColor(Color.Yellow, Label.ControlState.Normal);
                         if (mSelectedQuest.InProgressDescription.Length > 0)
                         {
+                            PacketSender.SendConvertChatCommands(mSelectedQuest.InProgressDescription, mSelectedQuest.Id, false);
+
                             mQuestDescLabel.AddText(
                                 mSelectedQuest.InProgressDescription, Color.White, Alignments.Left,
                                 mQuestDescTemplateLabel.Font
