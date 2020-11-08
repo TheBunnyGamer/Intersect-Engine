@@ -17,6 +17,8 @@ namespace Intersect.Client.Entities.Events
     public class Event : Entity
     {
 
+        private static Random rnd = new Random();
+
         public string Desc = "";
 
         public bool DirectionFix;
@@ -99,6 +101,12 @@ namespace Intersect.Client.Entities.Events
             switch (Graphic.Type)
             {
                 case EventGraphicType.Sprite: //Sprite
+
+                    if (Graphic.Filename == "chooserandomsprite.png")
+                    {
+                        Graphic.Filename = rnd.Next(49, 193).ToString() + ".png";
+                    }
+
                     var entityTex = Globals.ContentManager.GetTexture(
                         GameContentManager.TextureType.Entity, Graphic.Filename
                     );
