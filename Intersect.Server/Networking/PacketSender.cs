@@ -26,6 +26,10 @@ using JetBrains.Annotations;
 
 namespace Intersect.Server.Networking
 {
+    public static class randomblockclass
+    {
+        public static Random randomblock = new Random();
+    }
 
     public static class PacketSender
     {
@@ -143,8 +147,50 @@ namespace Intersect.Server.Networking
             }
             else
             {
+                byte[] thetiledata = map.TileData;
+                byte[] theattributedata = map.AttributeData;
+                if (new string(MapInstance.Get(mapId).Name.Take(8).ToArray()) == "[Random]")
+                {
+                    MapInstance[] allmapstable = new MapInstance[MapList.OrderedMaps.Count];
+                    for (int mapi = 0; mapi < MapList.OrderedMaps.Count; mapi++)
+                    {
+                        if (new string(MapInstance.Get(MapList.OrderedMaps[mapi].MapId).Name.Take(12).ToArray()) == "[RandomBank]")
+                        {
+                            //adds to first null allmapstable value
+                            for (int i = 0; i < allmapstable.Length; i++)
+                            {
+                                if (allmapstable[i] == null)
+                                {
+                                    allmapstable[i] = MapInstance.Get(MapList.OrderedMaps[mapi].MapId);
+                                    break;
+                                }
+                            }
+                            //end that
+                        }
+                    }
+                    thetiledata = null;
+
+                    int allmapstablereallength = allmapstable.Length;
+                    for (int i = 0; i < allmapstable.Length; i++)
+                    {
+                        if (allmapstable[i] == null)
+                        {
+                            allmapstablereallength = i - 1;
+                            break;
+                        }
+                    }
+
+                    while (thetiledata == null)
+                    {
+                        int temporaryrandomnumber = randomblockclass.randomblock.Next(0, allmapstablereallength);
+                        thetiledata = allmapstable[temporaryrandomnumber].TileData;
+                        theattributedata = allmapstable[temporaryrandomnumber].AttributeData;
+                    }
+
+                    //thetiledata = MapInstance.Get(Guid.Parse("a2aaadee-f99b-4498-9062-91ae91d882eb")).TileData;
+                }
                 var mapPacket = new MapPacket(
-                    mapId, false, map.JsonData, map.TileData, map.AttributeData, map.Revision, map.MapGridX,
+                    mapId, false, map.JsonData, thetiledata, theattributedata, map.Revision, map.MapGridX,
                     map.MapGridY, new bool[4]
                 );
 
