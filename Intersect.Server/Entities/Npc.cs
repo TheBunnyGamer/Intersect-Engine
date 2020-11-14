@@ -180,14 +180,21 @@ namespace Intersect.Server.Entities
                         string ownername = "";
                         string thiseventname = this.Name;
                         string tempnpcname = thiseventname;
-                        for (int i = 0; tempnpcname[i].ToString() != "]"; i++)
+                        if (tempnpcname[0].ToString() == "[")
                         {
-                            if (tempnpcname[i].ToString() != "[")
+                            for (int i = 0; tempnpcname[i].ToString() != "]"; i++)
                             {
-                                ownername += tempnpcname[i].ToString();
+                                if (tempnpcname[i].ToString() != "[")
+                                {
+                                    ownername += tempnpcname[i].ToString();
+                                }
+                            }
+                            if (ownername == "" || ownername == en.Name)
+                            {
+                                Target = en;
                             }
                         }
-                        if (ownername == "" || ownername == en.Name)
+                        else
                         {
                             Target = en;
                         }
