@@ -1740,13 +1740,20 @@ namespace Intersect.Client.Networking
         //ConvertChatCmdReturnPacket
         private static void HandlePacket(ConvertChatCmdReturnPacket packet)
         {
-            if (packet.OfferOrDesc == false)
+            if (ItemBase.Get(packet.questid) != null)
             {
-                QuestBase.Get(packet.questid).InProgressDescription = packet.newstring;
+                ItemBase.Get(packet.questid).Name = packet.newstring;
             }
             else
             {
-                QuestBase.Get(packet.questid).StartDescription = packet.newstring;
+                if (packet.OfferOrDesc == false)
+                {
+                    QuestBase.Get(packet.questid).InProgressDescription = packet.newstring;
+                }
+                else
+                {
+                    QuestBase.Get(packet.questid).StartDescription = packet.newstring;
+                }
             }
         }
 

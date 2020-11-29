@@ -6,6 +6,7 @@ using Intersect.Client.General;
 using Intersect.Client.Localization;
 using Intersect.Enums;
 using Intersect.GameObjects;
+using System.Threading;
 
 using JetBrains.Annotations;
 
@@ -32,6 +33,7 @@ namespace Intersect.Client.Interface.Game
             if (string.IsNullOrWhiteSpace(title))
             {
                 title = item.Name;
+                Intersect.Client.Networking.PacketSender.SendConvertChatCommands(item.Name, item.Id, true);
             }
 
             mDescWindow = new ImagePanel(Interface.GameUi.GameCanvas, "ItemDescWindow");
@@ -46,6 +48,17 @@ namespace Intersect.Client.Interface.Game
 
                 var itemName = new Label(mDescWindow, "ItemNameLabel");
                 itemName.Text = title;
+
+                new Thread(() =>
+                {
+                    Thread.CurrentThread.IsBackground = true;
+                    /* run your code here */
+                    for (int i = 0; i < 5; i++)
+                    {
+                        Thread.Sleep(500);
+                        itemName.Text = item.Name;
+                    }
+                }).Start();
 
                 var itemQuantity = new Label(mDescWindow, "ItemQuantityLabel");
 
